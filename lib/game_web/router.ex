@@ -17,10 +17,12 @@ defmodule GameWeb.Router do
   scope "/", GameWeb do
     pipe_through :browser
 
-    get "/", HomeController, :home
-    get "/new", HomeController, :new
-    get "/join", HomeController, :join
-    live "/rooms/:room", RoomLive
+    get "/", PageController, :home
+    get "/new", PageController, :new
+    get "/join", PageController, :join
+    get "/rooms/:room", PageController, :room
+
+    post "/name", PageController, :name
   end
 
   # Other scopes may use custom stacks.

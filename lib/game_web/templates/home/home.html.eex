@@ -1,3 +1,0 @@
-<h1>Just One!</h1>
-<a class="button" href="<%= Routes.home_path(@conn, :new) %>">New Game</a>
-<a class="button button-outline" href="<%= Routes.home_path(@conn, :join) %>">Join Game</a>

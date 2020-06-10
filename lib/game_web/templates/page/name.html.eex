@@ -1,0 +1,6 @@
+<h1>Room: <%= @room %></h1>
+<h2>Enter your name</h2>
+<%= form_for :form, "/name", fn f -> %>
+  <%= text_input f, :name %>
+  <%= submit "Submit" %>
+<% end %>

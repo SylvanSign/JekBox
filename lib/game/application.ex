@@ -9,13 +9,10 @@ defmodule Game.Application do
     children = [
       # Start the Telemetry supervisor
       GameWeb.Telemetry,
-      # Start the PubSub system
       {Phoenix.PubSub, name: Game.PubSub},
-      # Start the Endpoint (http/https)
       GameWeb.Endpoint,
-      # Start a worker by calling: Game.Worker.start_link(arg)
-      # {Game.Worker, arg}
-      GameWeb.Rooms
+      {Game.Rooms, name: Game.Rooms},
+      {DynamicSupervisor, name: Game.RoomSupervisor, strategy: :one_for_one}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
