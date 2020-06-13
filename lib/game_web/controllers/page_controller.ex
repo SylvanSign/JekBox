@@ -44,6 +44,8 @@ defmodule GameWeb.PageController do
   end
 
   def join_room(conn, %{"form" => %{"room" => room}}) do
+    room = String.upcase(room)
+
     case Rooms.join(room) do
       :ok ->
         conn

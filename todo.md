@@ -1,7 +1,7 @@
 # Features
 
 ## Before Launch
-- add input props to set min/max char limit, disable autocomplete, history, transform text to uppercase (jekbox)
+- make sure always uppercase rooms and names and whatnot
 
 ## After Launch
 - test using domain (jekbox.com)
