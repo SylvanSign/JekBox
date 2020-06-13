@@ -48,6 +48,7 @@ defmodule Game.Server.Room do
   defp register_pid(%__MODULE__{pids: pids} = state, pid) do
     Process.monitor(pid)
     %__MODULE__{state | pids: MapSet.put(pids, pid)}
+    :ok
   end
 
   defp forget_pid(%__MODULE__{pids: pids}, pid) do

@@ -18,6 +18,10 @@ defmodule Game.Server.Rooms do
     GenServer.call(__MODULE__, :new)
   end
 
+  def join(room) do
+    GenServer.call(__MODULE__, {:join, room})
+  end
+
   # Server Callbacks
   @impl true
   def init(:ok) do
@@ -29,6 +33,17 @@ defmodule Game.Server.Rooms do
     {room, rooms} = create_room(rooms)
     :ok = Game.Server.Room.register(room, from_pid)
     {:reply, room, rooms}
+  end
+
+  @impl true
+  def handle_call({:join, room}, {pid, _ref}, rooms) do
+    case join_room(rooms, room, pid) do
+      :ok ->
+        {:reply, :ok, rooms}
+
+      :error ->
+        {:reply, :error, rooms}
+    end
   end
 
   @impl true
@@ -49,6 +64,14 @@ defmodule Game.Server.Rooms do
     {:ok, _} = DynamicSupervisor.start_child(Game.Server.RoomSupervisor, {Game.Server.Room, room})
     Process.monitor(room)
     {room, MapSet.put(rooms, room)}
+  end
+
+  defp join_room(rooms, room, pid) do
+    if MapSet.member?(rooms, room) do
+      Game.Server.Room.register(room, pid)
+    else
+      :error
+    end
   end
 
   defp delete_room(rooms, room) do

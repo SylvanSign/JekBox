@@ -1,3 +1,4 @@
 <h1>Just One!</h1>
+<h2>Welcome, <%= @name %></h2>
 <a class="button" href="<%= Routes.page_path(@conn, :new) %>">New Game</a>
 <a class="button button-outline" href="<%= Routes.page_path(@conn, :join) %>">Join Game</a>

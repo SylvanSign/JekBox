@@ -20,11 +20,11 @@ defmodule GameWeb.Router do
     get "/", PageController, :home
     get "/new", PageController, :new
     get "/join", PageController, :join
-    post "/join", PageController, :join_room
     get "/rooms/:room", PageController, :room
     get "/rooms/:room/game", PageController, :game
 
     post "/name", PageController, :name
+    post "/join", PageController, :join_room
   end
 
   # Other scopes may use custom stacks.
