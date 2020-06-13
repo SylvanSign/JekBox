@@ -3,7 +3,7 @@ defmodule GameWeb.PageController do
   alias Game.Server.Rooms
 
   # TODO make a more intuitve "name change" workflow
-  def home(conn, %{"n" => _}) do
+  def home(conn, %{"change" => _}) do
     render(conn, "name.html")
   end
 
@@ -13,8 +13,22 @@ defmodule GameWeb.PageController do
         render(conn, "name.html")
 
       name ->
-        render(conn, "home.html", name: name)
+        case get_session(conn, :room) do
+          nil ->
+            render(conn, "home.html", name: name)
+
+          room ->
+            redirect(conn, to: Routes.page_path(conn, :lobby, room))
+        end
     end
+  end
+
+  def name(conn, %{"form" => %{"name" => name}}) do
+    name = String.upcase(name)
+
+    conn
+    |> put_session(:name, name)
+    |> redirect(to: Routes.page_path(conn, :home))
   end
 
   def new(conn, _params) do
@@ -22,7 +36,7 @@ defmodule GameWeb.PageController do
 
     conn
     |> put_session(:room, room)
-    |> redirect(to: Routes.page_path(conn, :room, room))
+    |> redirect(to: Routes.page_path(conn, :lobby, room))
   end
 
   def join(conn, _params) do
@@ -34,7 +48,7 @@ defmodule GameWeb.PageController do
       :ok ->
         conn
         |> put_session(:room, room)
-        |> redirect(to: Routes.page_path(conn, :room, room))
+        |> redirect(to: Routes.page_path(conn, :lobby, room))
 
       :error ->
         conn
@@ -43,20 +57,19 @@ defmodule GameWeb.PageController do
     end
   end
 
+  def lobby(conn, %{"room" => room}) do
+    if Rooms.exists?(room) do
+      name = get_session(conn, :name)
+      render(conn, "lobby.html", room: room, name: name)
+    else
+      conn
+      |> put_session(:room, nil)
+      |> put_flash(:error, "Cannot find room #{room}")
+      |> redirect(to: Routes.page_path(conn, :home))
+    end
+  end
+
   def game(conn, %{"room" => room}) do
     render(conn, "game.html", room: room)
-  end
-
-  def room(conn, %{"room" => room}) do
-    name = get_session(conn, :name)
-    render(conn, "lobby.html", room: room, name: name)
-  end
-
-  def name(conn, %{"form" => %{"name" => name}}) do
-    name = String.upcase(name)
-
-    conn
-    |> put_session(:name, name)
-    |> redirect(to: Routes.page_path(conn, :home))
   end
 end
