@@ -6,7 +6,7 @@ defmodule GameWeb.PageController do
   end
 
   def new(conn, _params) do
-    {room, _room_pid} = Game.Rooms.new()
+    room = Game.Server.Rooms.new()
 
     conn
     |> put_session(:room, room)

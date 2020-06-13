@@ -11,8 +11,7 @@ defmodule Game.Application do
       GameWeb.Telemetry,
       {Phoenix.PubSub, name: Game.PubSub},
       GameWeb.Endpoint,
-      {Game.Rooms, name: Game.Rooms},
-      {DynamicSupervisor, name: Game.RoomSupervisor, strategy: :one_for_one}
+      {Game.Server.Supervisor, name: Game.Server.Supervisor}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
