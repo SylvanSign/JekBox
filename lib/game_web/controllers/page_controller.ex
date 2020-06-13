@@ -6,7 +6,7 @@ defmodule GameWeb.PageController do
   end
 
   def new(conn, _params) do
-    room = Game.Rooms.new()
+    {room, _room_pid} = Game.Rooms.new()
 
     conn
     |> put_session(:room, room)
@@ -15,6 +15,22 @@ defmodule GameWeb.PageController do
 
   def join(conn, _params) do
     render(conn, "join.html")
+  end
+
+  def join_room(conn, %{"form" => %{"room" => room}}) do
+    conn
+    |> put_session(:room, room)
+    |> redirect(to: Routes.page_path(conn, :room, room))
+  end
+
+  def game(conn, %{"room" => room}) do
+    render(conn, "game.html", room: room)
+  end
+
+  # TODO make a more intuitve "name change" workflow
+  def room(conn, %{"room" => room, "change" => _}) do
+    name = get_session(conn, :name)
+    render(conn, "name.html", room: room, name: name)
   end
 
   def room(conn, %{"room" => room}) do

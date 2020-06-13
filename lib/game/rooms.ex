@@ -23,8 +23,9 @@ defmodule Game.Rooms do
 
   @impl true
   def handle_call(:new, {from_pid, _ref}, rooms) do
-    {:ok, name} = get_unique_room_name(rooms)
-    {:reply, name, Map.put(rooms, name, [from_pid])}
+    {:ok, room} = get_unique_room_name(rooms)
+    {:ok, room_pid} = DynamicSupervisor.start_child(Game.RoomSupervisor, {Game.Room, room})
+    {:reply, {room, room_pid}, Map.put(rooms, room_pid, [from_pid])}
   end
 
   @impl true

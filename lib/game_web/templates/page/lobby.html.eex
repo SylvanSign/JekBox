@@ -3,3 +3,4 @@
 <ul>
   <li><%= @name %></li>
 </ul>
+<a class="button" href="<%= Routes.page_path(@conn, :game, @room) %>">Start Game</a>
