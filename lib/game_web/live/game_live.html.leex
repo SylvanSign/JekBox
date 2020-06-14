@@ -20,8 +20,13 @@
     </ul>
     <button phx-click="start">START GAME</button>
   <% else %>
-    <%= if @state.step == :write_clues do %>
-      <%= unless @state.cur_pid == self() do %>
+    <%= if @state.cur_pid == self() do %>
+      <h2>You are the Guesser</h2>
+      <p>The others are secretly coming up with one-word clues to help you guess a mystery word.</p>
+      <p>You'll see those clues once they have finished writing them and removing any duplicates.</p>
+      <p>For now, you can relax.</p>
+    <% else %>
+      <%= if @state.step == :write_clues do %>
         <% guesser = Room.state(@room_pid).pids[@state.cur_pid] %>
         <h2>You are a Clue Giver for <%= guesser %></h2>
         <p>You and the others are secretly coming up with one-word clues to help <%= guesser %> guess a mystery word.</p>
@@ -35,16 +40,9 @@
         <% else %>
           <h2>Waiting for other clues...</h2>
         <% end %>
-      <% else %>
-        <h2>You are the Guesser</h2>
-        <p>The others are secretly coming up with one-word clues to help you guess a mystery word.</p>
-        <p>You'll see those clues once they have finished writing them and removing any duplicates.</p>
-        <p>For now, you can relax.</p>
       <% end %>
-    <% end %>
 
-    <%= if @state.step == :compare_clues do %>
-      <%= unless @state.cur_pid == self() do %>
+      <%= if @state.step == :compare_clues do %>
         <h2><%= hd(@state.words) %></h2>
         <p>Exact clue matches have been automaticaly removed.</p>
         <p>Please click to box any words which are</p>
