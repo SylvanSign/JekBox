@@ -21,14 +21,23 @@ defmodule Game.Server.Rooms do
     GenServer.call(__MODULE__, {:exists?, room})
   end
 
+  def pid(room) do
+    GenServer.call(__MODULE__, {:pid, room})
+  end
+
   # Server Callbacks
   @impl true
   def init(:ok) do
-    {:ok, MapSet.new()}
+    {:ok, Map.new()}
   end
 
   @impl true
-  def handle_call(:new, {from_pid, _ref}, rooms) do
+  def handle_call(:state, _from, rooms) do
+    {:reply, rooms, rooms}
+  end
+
+  @impl true
+  def handle_call(:new, _from, rooms) do
     {room, rooms} = create_room(rooms)
     {:reply, room, rooms}
   end
@@ -39,8 +48,8 @@ defmodule Game.Server.Rooms do
   end
 
   @impl true
-  def handle_call(:state, _from, rooms) do
-    {:reply, rooms, rooms}
+  def handle_call({:pid, room}, _from, rooms) do
+    {:reply, Map.get(rooms, room), rooms}
   end
 
   @impl true
@@ -53,21 +62,24 @@ defmodule Game.Server.Rooms do
   # Private Helpers
   defp create_room(rooms) do
     {:ok, room} = get_unique_room_name(rooms)
-    {:ok, _} = DynamicSupervisor.start_child(Game.Server.RoomSupervisor, {Game.Server.Room, room})
-    Process.monitor(room)
-    {room, MapSet.put(rooms, room)}
+
+    {:ok, room_pid} =
+      DynamicSupervisor.start_child(Game.Server.RoomSupervisor, {Game.Server.Room, room})
+
+    Process.monitor(room_pid)
+    {room, Map.put(rooms, room, room_pid)}
   end
 
   defp room_exists?(rooms, room) do
-    MapSet.member?(rooms, room)
+    Map.has_key?(rooms, room)
   end
 
   defp delete_room(rooms, room) do
-    MapSet.delete(rooms, room)
+    Map.delete(rooms, room)
   end
 
   defp get_unique_room_name(rooms, name \\ generate_new_name(), tries \\ 0) do
-    unless MapSet.member?(rooms, name) do
+    unless Map.has_key?(rooms, name) do
       {:ok, name}
     else
       unless tries > 1000 do
@@ -83,6 +95,5 @@ defmodule Game.Server.Rooms do
       [Enum.random(@chars) | acc]
     end)
     |> Enum.join("")
-    |> String.to_atom()
   end
 end

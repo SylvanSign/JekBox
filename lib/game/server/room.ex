@@ -7,7 +7,7 @@ defmodule Game.Server.Room do
 
   # Client API
   def start_link(room) do
-    GenServer.start_link(__MODULE__, room, name: room)
+    GenServer.start_link(__MODULE__, room)
   end
 
   def state(room) do
@@ -16,6 +16,10 @@ defmodule Game.Server.Room do
 
   def register(room, name) do
     GenServer.call(room, {:register, self(), name})
+  end
+
+  def start(room) do
+    GenServer.call(room, :start)
   end
 
   # Server Callbacks
@@ -33,6 +37,13 @@ defmodule Game.Server.Room do
   @impl true
   def handle_call({:register, pid, name}, _from, state) do
     {:reply, :ok, register_pid(state, pid, name)}
+  end
+
+  @impl true
+  def handle_call(:start, _from, state) do
+    IO.inspect(state)
+    GameWeb.Endpoint.broadcast!(state.room, "state", %{state: :start})
+    {:reply, :ok, state}
   end
 
   @impl true
@@ -55,7 +66,7 @@ defmodule Game.Server.Room do
   end
 
   @impl true
-  def handle_info(:close_if_empty, %__MODULE__{pids: pids, room: room} = state) do
+  def handle_info(:close_if_empty, %__MODULE__{room: room} = state) do
     IO.puts("Room #{room} shutting down after timing out")
     {:stop, :shutdown, state}
   end
@@ -69,7 +80,7 @@ defmodule Game.Server.Room do
   defp forget_pid(%__MODULE__{pids: pids} = state, pid) do
     pids = Map.delete(pids, pid)
 
-    if Map.size(pids) == 0 do
+    if map_size(pids) == 0 do
       :timer.send_after(@timeout, :close_if_empty)
     end
 

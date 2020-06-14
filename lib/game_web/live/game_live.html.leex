@@ -15,5 +15,7 @@
 
 <%# Game State %>
 <%= if @state == :game do %>
-<h1>GAME TIME</h1>
+<%= if @game_state == :write_clues do %>
+<h1>Word: <%= @word %></h1>
+<% end %>
 <% end %>
