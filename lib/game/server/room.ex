@@ -1,5 +1,6 @@
 defmodule Game.Server.Room do
   use GenServer, restart: :temporary
+  alias Game.JustOne.State
 
   @timeout 5000
 
@@ -18,11 +19,20 @@ defmodule Game.Server.Room do
   end
 
   def register(room, name) do
-    GenServer.call(room, {:register, self(), name})
+    GenServer.call(room, {:register, name})
   end
 
   def start(room) do
     GenServer.call(room, :start)
+  end
+
+  def clue(room, clue) do
+    clue =
+      clue
+      |> String.trim()
+      |> String.upcase()
+
+    GenServer.call(room, {:clue, clue})
   end
 
   # Server Callbacks
@@ -30,12 +40,7 @@ defmodule Game.Server.Room do
   def init(room) do
     :timer.send_after(@timeout, room, :close_if_empty)
 
-    {:ok,
-     %{
-       room: room,
-       pids: Map.new(),
-       step: :lobby
-     }}
+    {:ok, Game.JustOne.State.new(room)}
   end
 
   @impl true
@@ -44,7 +49,7 @@ defmodule Game.Server.Room do
   end
 
   @impl true
-  def handle_call({:register, pid, name}, _from, state) do
+  def handle_call({:register, name}, {pid, _}, state) do
     {:reply, :ok,
      state
      |> register_pid(pid, name)
@@ -55,11 +60,15 @@ defmodule Game.Server.Room do
   def handle_call(:start, _from, state) do
     {:reply, :ok,
      state
-     |> Map.merge(%{
-       step: :game,
-       phase: :write_clues,
-       words: Game.JustOne.Words.new()
-     })
+     |> State.start()
+     |> broadcast_state()}
+  end
+
+  @impl true
+  def handle_call({:clue, clue}, {pid, _}, state) do
+    {:reply, :ok,
+     state
+     |> State.clue(pid, clue)
      |> broadcast_state()}
   end
 
@@ -91,23 +100,27 @@ defmodule Game.Server.Room do
   end
 
   # Private Helpers
-  defp register_pid(%{pids: pids} = state, pid, name) do
+  defp register_pid(state, pid, name) do
     Process.monitor(pid)
-    %{state | pids: Map.put(pids, pid, name)}
+    State.register_pid(state, pid, name)
   end
 
-  defp forget_pid(%{pids: pids} = state, pid) do
-    pids = Map.delete(pids, pid)
+  defp forget_pid(state, pid) do
+    %{pids: pids} = state = State.forget_pid(state, pid)
 
     if map_size(pids) == 0 do
       :timer.send_after(@timeout, :close_if_empty)
     end
 
-    %{state | pids: pids}
+    state
   end
 
-  defp broadcast_state(state) do
+  defp broadcast_state(%{broadcast: true} = state) do
     GameWeb.Endpoint.broadcast!(state.room, "state", %{state: state})
+    state
+  end
+
+  defp broadcast_state(%{broadcast: false} = state) do
     state
   end
 end

@@ -18,9 +18,17 @@ defmodule GameWeb.GameLive do
     if connected?(socket) do
       room_pid = Rooms.pid(room)
       GameWeb.Endpoint.subscribe(room)
-      Room.register(room_pid, name)
 
-      {:ok, assign(socket, room_pid: room_pid)}
+      case Room.register(room_pid, name) do
+        :ok ->
+          {:ok, assign(socket, room_pid: room_pid)}
+
+        {:error, error} ->
+          {:ok,
+           socket
+           |> put_flash(:error, error)
+           |> redirect(to: Routes.page_path(socket, :home))}
+      end
     else
       {:ok, socket}
     end
@@ -30,6 +38,12 @@ defmodule GameWeb.GameLive do
   def handle_event("start", _event, socket) do
     Room.start(socket.assigns.room_pid)
 
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("clue", %{"clue" => %{"clue" => clue}}, socket) do
+    Room.clue(socket.assigns.room_pid, clue)
     {:noreply, socket}
   end
 

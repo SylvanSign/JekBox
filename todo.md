@@ -5,6 +5,7 @@
 
 ## After Launch
 - option to replace hard/unknown words before clue writing
+- or maybe have synonym auto-suggestion button?
 - test using domain (jekbox.com)
 - allow name changes
 - liveview lobby with presence user list

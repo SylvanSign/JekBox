@@ -7,30 +7,37 @@
 </pre>
 <% end %>
 <%# END TODO %>
-<h1>Room: <%= @room %></h1>
 
 <%= if Map.has_key?(@state, :step) do %>
-  <h2>Players</h2>
-  <ul>
-  <%= for {_, name} <- @state.pids do %>
-    <li><%= name %></li>
-  <% end %>
-  </ul>
-
-  <%# Lobby State %>
   <%= if @state.step == :lobby do %>
+    <%# Lobby State %>
+    <h1>Room: <%= @room %></h1>
+    <h2>Players</h2>
+    <ul>
+    <%= for {_, name} <- @state.pid_list do %>
+      <li><%= name %></li>
+    <% end %>
+    </ul>
     <button phx-click="start">START GAME</button>
-  <% end %>
-
-  <%# Game State %>
-  <%= if @state.step == :game do %>
-    <%= if @state.phase == :write_clues do %>
-      <%= if true do %>
-      <h2>Word:</h2>
-      <ul>
-        <li><%= hd(@state.words) %></li>
-      </ul>
+  <% else %>
+    <h2>Players</h2>
+    <ul>
+    <%= for {_, name} <- @state.pid_list do %>
+      <li><%= name %></li>
+    <% end %>
+    </ul>
+    <%# Game State %>
+    <%= if @state.step == :write_clues do %>
+      <%= if Map.has_key?(@state.clues, self()) do %>
+        <h2><%= hd(@state.words) %></h2>
+      <% end %>
+      <%= if @state.clues[self()] == "" do %>
+        <%= f = form_for :clue, "", [phx_submit: "clue"] %>
+          <%= text_input f, :clue, autofocus: true, placeholder: "ENTER ONE WORD CLUE", style: "text-transform:uppercase", maxLength: 12, autocapitalize: "off", autocorrect: "off", autocomplete: "off" %>
+          <%= submit "Submit" %>
+        </form>
       <% else %>
+        <h2>Waiting for other clues...</h2>
       <% end %>
     <% end %>
   <% end %>
