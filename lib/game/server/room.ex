@@ -1,6 +1,9 @@
 defmodule Game.Server.Room do
   use GenServer, restart: :temporary
-  defstruct [:room, pids: MapSet.new()]
+
+  @timeout 5000
+
+  defstruct [:room, pids: Map.new()]
 
   # Client API
   def start_link(room) do
@@ -11,13 +14,14 @@ defmodule Game.Server.Room do
     GenServer.call(room, :state)
   end
 
-  def register(room, pid) do
-    GenServer.call(room, {:register, pid})
+  def register(room, name) do
+    GenServer.call(room, {:register, self(), name})
   end
 
   # Server Callbacks
   @impl true
   def init(room) do
+    :timer.send_after(@timeout, room, :close_if_empty)
     {:ok, %__MODULE__{room: room}}
   end
 
@@ -27,8 +31,8 @@ defmodule Game.Server.Room do
   end
 
   @impl true
-  def handle_call({:register, pid}, _from, state) do
-    {:reply, :ok, register_pid(state, pid)}
+  def handle_call({:register, pid, name}, _from, state) do
+    {:reply, :ok, register_pid(state, pid, name)}
   end
 
   @impl true
@@ -44,20 +48,31 @@ defmodule Game.Server.Room do
     end
   end
 
-  # Private Helpers
-  defp register_pid(%__MODULE__{pids: pids} = state, pid) do
-    Process.monitor(pid)
-    %__MODULE__{state | pids: MapSet.put(pids, pid)}
-    :ok
+  @impl true
+  def handle_info(:close_if_empty, %__MODULE__{pids: pids} = state)
+      when map_size(pids) > 0 do
+    {:noreply, state}
   end
 
-  defp forget_pid(%__MODULE__{pids: pids}, pid) do
-    case MapSet.size(pids) do
-      1 ->
-        :shutdown
+  @impl true
+  def handle_info(:close_if_empty, %__MODULE__{pids: pids, room: room} = state) do
+    IO.puts("Room #{room} shutting down after timing out")
+    {:stop, :shutdown, state}
+  end
 
-      _ ->
-        %__MODULE__{pids: MapSet.delete(pids, pid)}
+  # Private Helpers
+  defp register_pid(%__MODULE__{pids: pids} = state, pid, name) do
+    Process.monitor(pid)
+    %__MODULE__{state | pids: Map.put(pids, pid, name)}
+  end
+
+  defp forget_pid(%__MODULE__{pids: pids} = state, pid) do
+    pids = Map.delete(pids, pid)
+
+    if Map.size(pids) == 0 do
+      :timer.send_after(@timeout, :close_if_empty)
     end
+
+    %__MODULE__{state | pids: pids}
   end
 end

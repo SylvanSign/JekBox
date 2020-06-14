@@ -20,8 +20,8 @@ defmodule GameWeb.Router do
     get "/", PageController, :home
     get "/new", PageController, :new
     get "/join", PageController, :join
-    get "/rooms/:room/lobby", PageController, :lobby
-    get "/rooms/:room/game", PageController, :game
+
+    live "/rooms/:room", GameLive
 
     post "/name", PageController, :name
     post "/join", PageController, :join_room

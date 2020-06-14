@@ -1,6 +1,0 @@
-<h1>Room: <%= @room %></h1>
-<h2>Lobby</h2>
-<ul>
-  <li><%= @name %></li>
-</ul>
-<a class="button" href="<%= Routes.page_path(@conn, :game, @room) %>">Start Game</a>

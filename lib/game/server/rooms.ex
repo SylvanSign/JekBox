@@ -18,11 +18,7 @@ defmodule Game.Server.Rooms do
   end
 
   def exists?(room) do
-    GenServer.call(__MODULE__, {:exists?, String.to_atom(room)})
-  end
-
-  def join(room) do
-    GenServer.call(__MODULE__, {:join, String.to_atom(room)})
+    GenServer.call(__MODULE__, {:exists?, room})
   end
 
   # Server Callbacks
@@ -34,24 +30,12 @@ defmodule Game.Server.Rooms do
   @impl true
   def handle_call(:new, {from_pid, _ref}, rooms) do
     {room, rooms} = create_room(rooms)
-    :ok = Game.Server.Room.register(room, from_pid)
     {:reply, room, rooms}
   end
 
   @impl true
   def handle_call({:exists?, room}, _from, rooms) do
     {:reply, room_exists?(rooms, room), rooms}
-  end
-
-  @impl true
-  def handle_call({:join, room}, {pid, _ref}, rooms) do
-    case join_room(rooms, room, pid) do
-      :ok ->
-        {:reply, :ok, rooms}
-
-      :error ->
-        {:reply, :error, rooms}
-    end
   end
 
   @impl true
@@ -76,14 +60,6 @@ defmodule Game.Server.Rooms do
 
   defp room_exists?(rooms, room) do
     MapSet.member?(rooms, room)
-  end
-
-  defp join_room(rooms, room, pid) do
-    if room_exists?(rooms, room) do
-      Game.Server.Room.register(room, pid)
-    else
-      :error
-    end
   end
 
   defp delete_room(rooms, room) do

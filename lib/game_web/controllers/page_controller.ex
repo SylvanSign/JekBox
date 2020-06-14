@@ -13,13 +13,7 @@ defmodule GameWeb.PageController do
         render(conn, "name.html")
 
       name ->
-        case get_session(conn, :room) do
-          nil ->
-            render(conn, "home.html", name: name)
-
-          room ->
-            redirect(conn, to: Routes.page_path(conn, :lobby, room))
-        end
+        render(conn, "home.html", name: name)
     end
   end
 
@@ -35,8 +29,7 @@ defmodule GameWeb.PageController do
     room = Rooms.new()
 
     conn
-    |> put_session(:room, room)
-    |> redirect(to: Routes.page_path(conn, :lobby, room))
+    |> redirect(to: Routes.live_path(conn, GameWeb.GameLive, room))
   end
 
   def join(conn, _params) do
@@ -44,30 +37,15 @@ defmodule GameWeb.PageController do
   end
 
   def join_room(conn, %{"form" => %{"room" => room}}) do
-    room = String.upcase(room)
+    room = Game.Util.transform_room(room)
 
-    case Rooms.join(room) do
-      :ok ->
-        conn
-        |> put_session(:room, room)
-        |> redirect(to: Routes.page_path(conn, :lobby, room))
-
-      :error ->
-        conn
-        |> put_flash(:error, "Cannot find room #{room}")
-        |> redirect(to: Routes.page_path(conn, :join))
-    end
-  end
-
-  def lobby(conn, %{"room" => room}) do
     if Rooms.exists?(room) do
-      name = get_session(conn, :name)
-      render(conn, "lobby.html", room: room, name: name)
+      conn
+      |> redirect(to: Routes.live_path(conn, GameWeb.GameLive, room))
     else
       conn
-      |> put_session(:room, nil)
       |> put_flash(:error, "Cannot find room #{room}")
-      |> redirect(to: Routes.page_path(conn, :home))
+      |> redirect(to: Routes.page_path(conn, :join))
     end
   end
 

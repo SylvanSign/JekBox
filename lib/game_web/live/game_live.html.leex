@@ -1,0 +1,19 @@
+<%# START TODO remove debugging info before launch %>
+<h3>START DEBUGGING</h3>
+<h3>state: <%= @state %></h3>
+<h3>END DEBUGGING</h3>
+<%# END TODO %>
+<h1>Room: <%= @room %></h1>
+
+<%# Lobby State %>
+<%= if @state == :lobby do %>
+<ul>
+  <li><%= @name %></li>
+</ul>
+<button phx-click="start">START GAME</button>
+<% end %>
+
+<%# Game State %>
+<%= if @state == :game do %>
+<h1>GAME TIME</h1>
+<% end %>
