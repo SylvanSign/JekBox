@@ -5,25 +5,25 @@ defmodule GameWeb.PageController do
 
   # TODO make a more intuitve "name change" workflow
   def home(conn, %{"change" => _}) do
-    render(conn, "name.html")
+    render(conn, "name.html", to: Routes.page_path(conn, :home))
   end
 
   def home(conn, _params) do
     case get_session(conn, :name) do
       nil ->
-        render(conn, "name.html")
+        render(conn, "name.html", to: Routes.page_path(conn, :home))
 
       name ->
         render(conn, "home.html", name: name)
     end
   end
 
-  def name(conn, %{"form" => %{"name" => name}}) do
+  def name(conn, %{"form" => %{"name" => name, "to" => to}}) do
     name = String.upcase(name)
 
     conn
     |> put_session(:name, name)
-    |> redirect(to: Routes.page_path(conn, :home))
+    |> redirect(to: to)
   end
 
   def new(conn, _params) do
@@ -53,10 +53,16 @@ defmodule GameWeb.PageController do
   def game(conn, %{"room" => room}) do
     room = Game.Util.transform_room(room)
 
-    if Rooms.exists?(room) do
-      live_render(conn, GameWeb.GameLive, session: %{"room" => room})
-    else
-      redirect(conn, to: Routes.page_path(conn, :home))
+    case get_session(conn, :name) do
+      nil ->
+        render(conn, "name.html", to: Routes.page_path(conn, :game, room))
+
+      name ->
+        if Rooms.exists?(room) do
+          live_render(conn, GameWeb.GameLive, session: %{"room" => room})
+        else
+          redirect(conn, to: Routes.page_path(conn, :home))
+        end
     end
   end
 end

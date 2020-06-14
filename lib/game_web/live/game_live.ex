@@ -9,7 +9,7 @@ defmodule GameWeb.GameLive do
       assign(socket,
         room: room,
         name: name,
-        state: :lobby
+        state: %{}
       )
 
     if connected?(socket) do

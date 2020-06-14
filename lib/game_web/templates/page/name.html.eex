@@ -1,5 +1,6 @@
 <h2>Enter your JekBox name</h2>
 <%= form_for :form, "/name", fn f -> %>
+  <%= hidden_input f, :to, value: @to %>
   <%= text_input f, :name, autofocus: true, placeholder: "ENTER YOUR NAME", style: "text-transform:uppercase", maxLength: 12, autocapitalize: "off", autocorrect: "off", autocomplete: "off" %>
   <%= submit "Submit" %>
 <% end %>
