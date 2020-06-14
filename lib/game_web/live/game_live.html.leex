@@ -20,24 +20,45 @@
     </ul>
     <button phx-click="start">START GAME</button>
   <% else %>
-    <h2>Players</h2>
-    <ul>
-    <%= for {_, name} <- @state.pid_list do %>
-      <li><%= name %></li>
-    <% end %>
-    </ul>
-    <%# Game State %>
     <%= if @state.step == :write_clues do %>
-      <%= if Map.has_key?(@state.clues, self()) do %>
+      <%= unless @state.cur_pid == self() do %>
+        <% guesser = Room.state(@room_pid).pids[@state.cur_pid] %>
+        <h2>You are a Clue Giver for <%= guesser %></h2>
+        <p>You and the others are secretly coming up with one-word clues to help <%= guesser %> guess a mystery word.</p>
+        <p>Be careful, as you cannot discuss your clues before sending them, and any duplicate clues will be removed!</p>
         <h2><%= hd(@state.words) %></h2>
-      <% end %>
-      <%= if @state.clues[self()] == "" do %>
-        <%= f = form_for :clue, "", [phx_submit: "clue"] %>
-          <%= text_input f, :clue, autofocus: true, placeholder: "ENTER ONE WORD CLUE", style: "text-transform:uppercase", maxLength: 12, autocapitalize: "off", autocorrect: "off", autocomplete: "off" %>
-          <%= submit "Submit" %>
-        </form>
+        <%= if @state.clues[self()] == "" do %>
+          <%= f = form_for :clue, "", [phx_submit: "clue"] %>
+            <%= text_input f, :clue, autofocus: true, placeholder: "ENTER ONE WORD CLUE", style: "text-transform:uppercase", maxLength: 12, autocapitalize: "off", autocorrect: "off", autocomplete: "off" %>
+            <%= submit "Submit" %>
+          </form>
+        <% else %>
+          <h2>Waiting for other clues...</h2>
+        <% end %>
       <% else %>
-        <h2>Waiting for other clues...</h2>
+        <h2>You are the Guesser</h2>
+        <p>The others are secretly coming up with one-word clues to help you guess a mystery word.</p>
+        <p>You'll see those clues once they have finished writing them and removing any duplicates.</p>
+        <p>For now, you can relax.</p>
+      <% end %>
+    <% end %>
+
+    <%= if @state.step == :compare_clues do %>
+      <%= unless @state.cur_pid == self() do %>
+        <h2><%= hd(@state.words) %></h2>
+        <p>Exact clue matches have been automaticaly removed.</p>
+        <p>Please click to box any words which are</p>
+        <ul>
+          <li>in the same word family (eg. "PRINCE" and "PRINCESS")</li>
+          <li>variants of the same word (eg. plurals, gender differentiations, typos)</li>
+        </ul>
+        <p>these will be removed once the "DONE REMOVING CLUES" button is clicked</p>
+        <%= for {clue, selected} <- @state.clues do %>
+          <% class = unless selected, do: "button-clear", else: "button-outline" %>
+          <button class="<%= class %>" phx-click="remove_clue" phx-value-clue="<%= clue %>"><%= clue %></button>
+        <% end %>
+        <br>
+        <button phx-click="done_clues">DONE REMOVING CLUES</button>
       <% end %>
     <% end %>
   <% end %>

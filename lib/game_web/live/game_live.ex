@@ -48,6 +48,12 @@ defmodule GameWeb.GameLive do
   end
 
   @impl true
+  def handle_event("remove_clue", %{"clue" => clue}, socket) do
+    Room.mark_duplicate(socket.assigns.room_pid, clue)
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info(%{event: "state", payload: %{state: state}}, socket) do
     {:noreply,
      assign(socket,

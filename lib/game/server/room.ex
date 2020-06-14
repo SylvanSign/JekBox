@@ -35,6 +35,10 @@ defmodule Game.Server.Room do
     GenServer.call(room, {:clue, clue})
   end
 
+  def mark_duplicate(room, clue) do
+    GenServer.call(room, {:mark_duplicate, clue})
+  end
+
   # Server Callbacks
   @impl true
   def init(room) do
@@ -69,6 +73,14 @@ defmodule Game.Server.Room do
     {:reply, :ok,
      state
      |> State.clue(pid, clue)
+     |> broadcast_state()}
+  end
+
+  @impl true
+  def handle_call({:mark_duplicate, clue}, _from, state) do
+    {:reply, :ok,
+     state
+     |> State.mark_duplicate(clue)
      |> broadcast_state()}
   end
 

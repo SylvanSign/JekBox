@@ -9,6 +9,7 @@ defmodule Game.JustOne.State do
       step: :lobby,
       pids: Map.new(),
       pid_list: [],
+      cur_pid: nil,
       cur_seat: 0,
       cur_word: nil,
       words: JustOne.Words.new(),
@@ -23,23 +24,21 @@ defmodule Game.JustOne.State do
     |> write_clues()
   end
 
-  def write_clues(state) do
-    clues = clues(state)
+  def write_clues(%{pid_list: pid_list, cur_seat: cur_seat} = state) do
+    clues =
+      pid_list
+      |> List.delete_at(cur_seat)
+      |> Enum.map(&elem(&1, 0))
+      |> Enum.into(%{}, &{&1, ""})
 
     %{
       state
       | step: :write_clues,
         broadcast: true,
         clues: clues,
+        cur_pid: pid_list |> Enum.at(cur_seat) |> elem(0),
         pending_clues: map_size(clues)
     }
-  end
-
-  def clues(%{pid_list: pid_list, cur_seat: cur_seat} = state) do
-    pid_list
-    |> List.delete_at(cur_seat)
-    |> Enum.map(&elem(&1, 0))
-    |> Enum.into(%{}, &{&1, ""})
   end
 
   def clue(%{clues: clues, pending_clues: pending_clues} = state, pid, clue) do
@@ -57,9 +56,21 @@ defmodule Game.JustOne.State do
     else
       %{
         state
-        | step: :compare_clues
+        | step: :compare_clues,
+          clues:
+            clues
+            |> Enum.map(&elem(&1, 1))
+            |> Enum.uniq()
+            |> Enum.into(%{}, &{&1, false})
       }
     end
+  end
+
+  def mark_duplicate(%{clues: clues} = state, clue) do
+    %{
+      state
+      | clues: Map.update!(clues, clue, &(not &1))
+    }
   end
 
   def next_step([]) do
