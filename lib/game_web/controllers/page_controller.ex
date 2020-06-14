@@ -1,6 +1,7 @@
 defmodule GameWeb.PageController do
   use GameWeb, :controller
   alias Game.Server.Rooms
+  import Phoenix.LiveView.Controller
 
   # TODO make a more intuitve "name change" workflow
   def home(conn, %{"change" => _}) do
@@ -29,7 +30,7 @@ defmodule GameWeb.PageController do
     room = Rooms.new()
 
     conn
-    |> redirect(to: Routes.live_path(conn, GameWeb.GameLive, room))
+    |> redirect(to: Routes.page_path(conn, :game, room))
   end
 
   def join(conn, _params) do
@@ -41,7 +42,7 @@ defmodule GameWeb.PageController do
 
     if Rooms.exists?(room) do
       conn
-      |> redirect(to: Routes.live_path(conn, GameWeb.GameLive, room))
+      |> redirect(to: Routes.page_path(conn, :game, room))
     else
       conn
       |> put_flash(:error, "Cannot find room #{room}")
@@ -50,6 +51,12 @@ defmodule GameWeb.PageController do
   end
 
   def game(conn, %{"room" => room}) do
-    render(conn, "game.html", room: room)
+    room = Game.Util.transform_room(room)
+
+    if Rooms.exists?(room) do
+      live_render(conn, GameWeb.GameLive, session: %{"room" => room})
+    else
+      redirect(conn, to: Routes.page_path(conn, :home))
+    end
   end
 end

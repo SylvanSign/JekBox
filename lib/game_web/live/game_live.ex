@@ -4,24 +4,18 @@ defmodule GameWeb.GameLive do
   alias Game.Server.Room
 
   @impl true
-  def mount(%{"room" => room}, %{"name" => name}, socket) do
-    room = Game.Util.transform_room(room)
-
-    unless Rooms.exists?(room) do
-      {:ok, redirect(socket, to: Routes.page_path(socket, :home))}
-    else
-      if connected?(socket) do
-        IO.puts("registering with #{room}")
-        Room.register(room, name)
-      end
-
-      {:ok,
-       assign(socket,
-         room: room,
-         name: name,
-         state: :lobby
-       )}
+  def mount(:not_mounted_at_router, %{"room" => room, "name" => name}, socket) do
+    if connected?(socket) do
+      IO.puts("registering with #{room}")
+      Room.register(room, name)
     end
+
+    {:ok,
+     assign(socket,
+       room: room,
+       name: name,
+       state: :lobby
+     )}
   end
 
   @impl true
