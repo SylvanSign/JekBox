@@ -1,25 +1,37 @@
 <%# START TODO remove debugging info before launch %>
-<h3>START DEBUGGING</h3>
-<h3><%= inspect(@state) %></h3>
-<h3>END DEBUGGING</h3>
+<%= if @debug do %>
+<pre>
+  <%= for {k, v} <- @state do %>
+    <%= inspect(k) %> <%= inspect(v) %>
+  <% end %>
+</pre>
+<% end %>
 <%# END TODO %>
 <h1>Room: <%= @room %></h1>
 
 <%= if Map.has_key?(@state, :step) do %>
+  <h2>Players</h2>
+  <ul>
+  <%= for {_, name} <- @state.pids do %>
+    <li><%= name %></li>
+  <% end %>
+  </ul>
+
   <%# Lobby State %>
   <%= if @state.step == :lobby do %>
-    <ul>
-    <%= for {_, name} <- @state.pids do %>
-      <li><%= name %></li>
-    <% end %>
-    </ul>
     <button phx-click="start">START GAME</button>
   <% end %>
 
   <%# Game State %>
   <%= if @state.step == :game do %>
     <%= if @state.phase == :write_clues do %>
-      <h1>Word: <%= @word %></h1>
+      <%= if true do %>
+      <h2>Word:</h2>
+      <ul>
+        <li><%= hd(@state.words) %></li>
+      </ul>
+      <% else %>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>

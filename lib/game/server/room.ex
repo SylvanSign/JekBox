@@ -57,7 +57,7 @@ defmodule Game.Server.Room do
      state
      |> Map.merge(%{
        step: :game,
-       phrase: :write_clues,
+       phase: :write_clues,
        words: Game.JustOne.Words.new()
      })
      |> broadcast_state()}

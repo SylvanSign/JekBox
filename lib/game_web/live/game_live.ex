@@ -7,6 +7,9 @@ defmodule GameWeb.GameLive do
   def mount(:not_mounted_at_router, %{"room" => room, "name" => name}, socket) do
     socket =
       assign(socket,
+        # TODO remove this and part of template before launch
+        debug: true,
+        # debug: false,
         room: room,
         name: name,
         state: %{}
