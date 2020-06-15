@@ -107,12 +107,14 @@
                 <p><%= guesser %> can now try to Guess the mystery word, or Pass.</p>
               <% end %>
 
+              <h2>Clues:</h2>
               <%= for clue <- @state.clues do %>
                 <button class="button-clear"><%= clue %></button>
               <% end %>
+              <br>
 
               <%= if @state.cur_pid == self() do %>
-                <h3>Will you</h3>
+                <h2>Your Choice</h2>
                 <button phx-click="pass">PASS</button>
                 <h3>or</h3>
                 <%= f = form_for :guess, "", [phx_submit: "guess"] %>
