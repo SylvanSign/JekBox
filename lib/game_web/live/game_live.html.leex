@@ -47,7 +47,9 @@
 
       <%= if @state.step == :correct_guess do %>
         <h3><%= @state.cur_word %> was guessed correctly!</h3>
-        <button phx-click="start">CONTINUE</button>
+        <%= if @state.cur_pid == self() do %>
+          <button phx-click="start">CONTINUE</button>
+        <% end %>
     <% else %>
         <%= if @state.step == :check_guess do %>
           <h3>Please check your guess</h3>
