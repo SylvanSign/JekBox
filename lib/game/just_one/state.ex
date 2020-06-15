@@ -1,30 +1,37 @@
 defmodule Game.JustOne.State do
   alias Game.JustOne
 
-  @steps [:write_clues, :compare_clues, :guess, :check_end]
-
-  def new(room) do
+  def new(room, words \\ 13) do
     %{
       room: room,
       step: :lobby,
       pids: Map.new(),
       pid_list: [],
       cur_pid: nil,
-      cur_seat: 0,
+      cur_seat: -1,
       cur_word: nil,
-      words: JustOne.Words.new(),
+      cur_guess: nil,
+      words: JustOne.Words.new(words),
       broadcast: true,
       clues: %{},
-      pending_clues: 0
+      pending_clues: 0,
+      scored: [],
+      lost: []
     }
   end
 
   def start(state) do
-    %{state | step: :game}
-    |> write_clues()
+    state
+    |> continue_or_end()
   end
 
-  def write_clues(%{pid_list: pid_list, cur_seat: cur_seat} = state) do
+  def write_clues(
+        %{
+          pid_list: pid_list,
+          cur_seat: cur_seat,
+          words: [word | words]
+        } = state
+      ) do
     clues =
       pid_list
       |> List.delete_at(cur_seat)
@@ -37,6 +44,8 @@ defmodule Game.JustOne.State do
         broadcast: true,
         clues: clues,
         cur_pid: pid_list |> Enum.at(cur_seat) |> elem(0),
+        cur_word: word,
+        words: words,
         pending_clues: map_size(clues)
     }
   end
@@ -66,15 +75,87 @@ defmodule Game.JustOne.State do
     end
   end
 
-  def mark_duplicate(%{clues: clues} = state, clue) do
+  def toggle_duplicate(%{clues: clues} = state, clue) do
     %{
       state
       | clues: Map.update!(clues, clue, &(not &1))
     }
   end
 
-  def next_step([]) do
-    @steps
+  def done_clues(%{clues: clues} = state) do
+    %{
+      state
+      | clues:
+          clues
+          |> Enum.reject(&elem(&1, 1))
+          |> Enum.map(&elem(&1, 0)),
+        step: :guess
+    }
+  end
+
+  def continue_or_end(%{words: words, cur_seat: cur_seat, pid_list: pid_list} = state) do
+    if Enum.empty?(words) do
+      %{
+        state
+        | step: :end
+      }
+    else
+      %{
+        state
+        | cur_seat: next_seat(cur_seat, pid_list)
+      }
+      |> write_clues()
+    end
+  end
+
+  def next_seat(cur_seat, pid_list) do
+    rem(cur_seat + 1, length(pid_list))
+  end
+
+  def pass(%{lost: lost, cur_word: cur_word} = state) do
+    %{
+      state
+      | lost: [cur_word | lost]
+    }
+    |> continue_or_end()
+  end
+
+  def guess(%{cur_word: guess, scored: scored} = state, guess) do
+    %{
+      state
+      | scored: [guess | scored],
+        step: :correct_guess
+    }
+  end
+
+  def guess(state, guess) do
+    %{
+      state
+      | step: :check_guess,
+        cur_guess: guess
+    }
+  end
+
+  def correct(%{cur_word: cur_word} = state) do
+    # Pretend we guessed correctly
+    guess(state, cur_word)
+  end
+
+  def incorrect(%{cur_word: cur_word, lost: lost, words: [next_word | words]} = state) do
+    %{
+      state
+      | lost: [next_word, cur_word | lost],
+        words: words
+    }
+    |> continue_or_end()
+  end
+
+  def incorrect(%{cur_word: cur_word, lost: lost, words: []} = state) do
+    %{
+      state
+      | lost: [cur_word | lost]
+    }
+    |> continue_or_end()
   end
 
   def register_pid(%{pids: pids} = state, pid, name) do
@@ -88,14 +169,6 @@ defmodule Game.JustOne.State do
   def forget_pid(%{pids: pids} = state, pid) do
     %{state | pids: Map.delete(pids, pid)}
     |> fix_state()
-  end
-
-  def act(%{steps: [:write_clues | ss], players: [cp | ps]} = state, p, action) when cp != p do
-    IO.puts("nice")
-  end
-
-  def act(_state, _player, _action) do
-    IO.puts("YIKERS")
   end
 
   def fix_state(

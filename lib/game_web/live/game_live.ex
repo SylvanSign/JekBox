@@ -8,8 +8,8 @@ defmodule GameWeb.GameLive do
     socket =
       assign(socket,
         # TODO remove this and part of template before launch
-        debug: true,
-        # debug: false,
+        # debug: true,
+        debug: false,
         room: room,
         name: name,
         state: %{}
@@ -48,8 +48,38 @@ defmodule GameWeb.GameLive do
   end
 
   @impl true
-  def handle_event("remove_clue", %{"clue" => clue}, socket) do
-    Room.mark_duplicate(socket.assigns.room_pid, clue)
+  def handle_event("toggle_duplicate", %{"clue" => clue}, socket) do
+    Room.toggle_duplicate(socket.assigns.room_pid, clue)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("done_clues", _event, socket) do
+    Room.done_clues(socket.assigns.room_pid)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("pass", _event, socket) do
+    Room.pass(socket.assigns.room_pid)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("guess", %{"guess" => %{"guess" => guess}}, socket) do
+    Room.guess(socket.assigns.room_pid, guess)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("correct", _event, socket) do
+    Room.correct(socket.assigns.room_pid)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("incorrect", _event, socket) do
+    Room.incorrect(socket.assigns.room_pid)
     {:noreply, socket}
   end
 

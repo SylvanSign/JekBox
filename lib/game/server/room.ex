@@ -2,6 +2,7 @@ defmodule Game.Server.Room do
   use GenServer, restart: :temporary
   alias Game.JustOne.State
 
+  @words 13
   @timeout 5000
 
   # Client API
@@ -35,8 +36,33 @@ defmodule Game.Server.Room do
     GenServer.call(room, {:clue, clue})
   end
 
-  def mark_duplicate(room, clue) do
-    GenServer.call(room, {:mark_duplicate, clue})
+  def toggle_duplicate(room, clue) do
+    GenServer.call(room, {:toggle_duplicate, clue})
+  end
+
+  def done_clues(room) do
+    GenServer.call(room, :done_clues)
+  end
+
+  def guess(room, guess) do
+    guess =
+      guess
+      |> String.trim()
+      |> String.upcase()
+
+    GenServer.call(room, {:guess, guess})
+  end
+
+  def pass(room) do
+    GenServer.call(room, :pass)
+  end
+
+  def correct(room) do
+    GenServer.call(room, :correct)
+  end
+
+  def incorrect(room) do
+    GenServer.call(room, :incorrect)
   end
 
   # Server Callbacks
@@ -44,7 +70,7 @@ defmodule Game.Server.Room do
   def init(room) do
     :timer.send_after(@timeout, room, :close_if_empty)
 
-    {:ok, Game.JustOne.State.new(room)}
+    {:ok, Game.JustOne.State.new(room, @words)}
   end
 
   @impl true
@@ -77,10 +103,50 @@ defmodule Game.Server.Room do
   end
 
   @impl true
-  def handle_call({:mark_duplicate, clue}, _from, state) do
+  def handle_call({:toggle_duplicate, clue}, _from, state) do
     {:reply, :ok,
      state
-     |> State.mark_duplicate(clue)
+     |> State.toggle_duplicate(clue)
+     |> broadcast_state()}
+  end
+
+  @impl true
+  def handle_call(:done_clues, _from, state) do
+    {:reply, :ok,
+     state
+     |> State.done_clues()
+     |> broadcast_state()}
+  end
+
+  @impl true
+  def handle_call({:guess, guess}, _from, state) do
+    {:reply, :ok,
+     state
+     |> State.guess(guess)
+     |> broadcast_state()}
+  end
+
+  @impl true
+  def handle_call(:pass, _from, state) do
+    {:reply, :ok,
+     state
+     |> State.pass()
+     |> broadcast_state()}
+  end
+
+  @impl true
+  def handle_call(:correct, _from, state) do
+    {:reply, :ok,
+     state
+     |> State.correct()
+     |> broadcast_state()}
+  end
+
+  @impl true
+  def handle_call(:incorrect, _from, state) do
+    {:reply, :ok,
+     state
+     |> State.incorrect()
      |> broadcast_state()}
   end
 
