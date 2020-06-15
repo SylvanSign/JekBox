@@ -4,6 +4,7 @@
 - make sure always uppercase rooms and names and whatnot
 
 ## After Launch
+- make sure refreshes work (need to attach id other than pid...)
 - validate all the things (one word clues, limit clue length, automate rules as much as possible, etc)
 - handle case where all clues were duplicates
 - option to replace hard/unknown words before clue writing
