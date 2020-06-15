@@ -29,8 +29,15 @@
           <li><%= scored %></li>
         <% end %>
       </ul>
+      <h3>Lost Words:</h3>
+      <ul>
+        <%= for lost <- @state.lost do %>
+          <li><%= lost %></li>
+        <% end %>
+      </ul>
       <%# TODO make this better with rulebook words about final score %>
     <% else %>
+      <h1>On Word <%= 13 - length(@state.words) %> of 13</h1>
       <% guesser = Room.state(@room_pid).pids[@state.cur_pid] %>
       <%= if @state.cur_pid == self() do %>
         <h2>You are the Guesser</h2>
