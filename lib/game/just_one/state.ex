@@ -1,7 +1,7 @@
 defmodule Game.JustOne.State do
   alias Game.JustOne
 
-  def new(room, words \\ 13) do
+  def new(room, word_count \\ 13) do
     %{
       room: room,
       step: :lobby,
@@ -11,7 +11,9 @@ defmodule Game.JustOne.State do
       cur_seat: -1,
       cur_word: nil,
       cur_guess: nil,
-      words: JustOne.Words.new(words),
+      guesser_name: nil,
+      words: JustOne.Words.new(word_count),
+      word_count: word_count,
       broadcast: true,
       clues: %{},
       pending_clues: 0,
@@ -38,12 +40,15 @@ defmodule Game.JustOne.State do
       |> Enum.map(&elem(&1, 0))
       |> Enum.into(%{}, &{&1, ""})
 
+    {cur_pid, guesser_name} = pid_list |> Enum.at(cur_seat)
+
     %{
       state
       | step: :write_clues,
         broadcast: true,
         clues: clues,
-        cur_pid: pid_list |> Enum.at(cur_seat) |> elem(0),
+        cur_pid: cur_pid,
+        guesser_name: guesser_name,
         cur_word: word,
         words: words,
         pending_clues: map_size(clues)

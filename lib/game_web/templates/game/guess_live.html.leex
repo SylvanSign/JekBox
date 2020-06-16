@@ -1,0 +1,15 @@
+<% name = if guesser?(assigns), do: "YOU", else: @state.guesser_name %>
+<h2><%= tag_guesser(name) %> will now <%= bold("GUESS") %> or <%= bold("PASS") %>.</h2>
+
+<%= for clue <- @state.clues do %>
+  <button class="button-clear"><%= clue %></button>
+<% end %>
+
+<%= if guesser?(assigns) do %>
+  <%= f = form_for :guess, "", [phx_submit: "guess"] %>
+    <%= text_input f, :guess, autofocus: true, placeholder: "GUESS MYSTERY WORD", style: "text-transform:uppercase", maxLength: 30, autocapitalize: "off", autocorrect: "off", autocomplete: "off" %>
+    <%= submit "GUESS" %>
+  </form>
+  <h3>or</h3>
+  <button phx-click="pass">PASS</button>
+<% end %>

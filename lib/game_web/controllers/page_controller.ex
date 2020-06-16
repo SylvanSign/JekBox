@@ -3,6 +3,10 @@ defmodule GameWeb.PageController do
   alias Game.Server.Rooms
   import Phoenix.LiveView.Controller
 
+  def play(conn, _) do
+    render(conn, "play.html")
+  end
+
   # TODO make a more intuitve "name change" workflow
   def home(conn, %{"change" => _}) do
     render(conn, "name.html", to: Routes.page_path(conn, :home))
@@ -57,7 +61,7 @@ defmodule GameWeb.PageController do
       nil ->
         render(conn, "name.html", to: Routes.page_path(conn, :game, room))
 
-      name ->
+      _ ->
         if Rooms.exists?(room) do
           live_render(conn, GameWeb.GameLive, session: %{"room" => room})
         else

@@ -2,8 +2,8 @@ defmodule Game.Server.Room do
   use GenServer, restart: :temporary
   alias Game.JustOne.State
 
-  @words 13
-  @timeout 5000
+  @words 2
+  @timeout 10_000
 
   # Client API
   def start_link(room) do

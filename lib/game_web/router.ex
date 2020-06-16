@@ -17,6 +17,8 @@ defmodule GameWeb.Router do
   scope "/", GameWeb do
     pipe_through :browser
 
+    get "/play", PageController, :play
+
     get "/", PageController, :home
     get "/new", PageController, :new
     get "/join", PageController, :join
