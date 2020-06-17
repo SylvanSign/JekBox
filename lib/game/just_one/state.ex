@@ -16,6 +16,7 @@ defmodule Game.JustOne.State do
       word_count: word_count,
       broadcast: true,
       clues: %{},
+      dups: [],
       pending_clues: 0,
       scored: [],
       lost: []
@@ -68,10 +69,13 @@ defmodule Game.JustOne.State do
     unless pending_clues == 0 do
       state
     else
+      {clues, dups} = prep_for_clue_comparison(clues)
+
       %{
         state
         | step: :compare_clues,
-          clues: prep_for_clue_comparison(clues)
+          clues: clues,
+          dups: dups
       }
     end
   end
@@ -79,10 +83,7 @@ defmodule Game.JustOne.State do
   def toggle_duplicate(%{clues: clues} = state, clue) do
     %{
       state
-      | clues:
-          Map.update!(clues, clue, fn {true, state} ->
-            {true, not state}
-          end)
+      | clues: Map.update!(clues, clue, &(not &1))
     }
   end
 
@@ -192,28 +193,29 @@ defmodule Game.JustOne.State do
   end
 
   def prep_for_clue_comparison(clues) do
-    {all, dups} =
+    {clues, dups} =
       clues
       |> Enum.map(&elem(&1, 1))
-      |> Enum.reduce({MapSet.new(), MapSet.new()}, fn clue, {all, dups} ->
-        if MapSet.member?(all, clue) do
-          {all, MapSet.put(dups, clue)}
+      |> Enum.reduce({%{}, %{}}, fn clue, {all, dups} ->
+        if Map.has_key?(all, clue) do
+          {all, Map.update(dups, clue, 2, &(&1 + 1))}
         else
-          {MapSet.put(all, clue), dups}
+          {Map.put(all, clue, false), dups}
         end
       end)
 
-    unique =
-      all
-      |> MapSet.difference(dups)
-      # {true, state} indicates that state can be toggled
-      |> Enum.into(%{}, &{&1, {true, false}})
+    clues =
+      clues
+      |> Enum.reject(&Map.has_key?(dups, elem(&1, 0)))
+      |> Enum.into(%{})
 
     dups =
       dups
-      # {false, state} indicates that state is locked (probably to true)
-      |> Enum.into(%{}, &{&1, {false, true}})
+      |> Enum.map(fn {dup, times} ->
+        List.duplicate(dup, times)
+      end)
+      |> Enum.concat()
 
-    Map.merge(dups, unique)
+    {clues, dups}
   end
 end
