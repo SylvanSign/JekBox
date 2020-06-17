@@ -2,9 +2,10 @@
 
 <%= unless guesser?(assigns) do %>
   <%= present_word(@state.cur_word) %>
-  <%= for {clue, selected} <- @state.clues do %>
+  <%= for {clue, {can_toggle?, selected}} <- @state.clues do %>
     <% class = unless selected, do: "button-clear", else: "button-outline" %>
-    <button class="<%= class %>" phx-click="toggle_duplicate" phx-value-clue="<%= clue %>"><%= clue %></button>
+    <% click_event = if can_toggle?, do: "phx-click=toggle_duplicate", else: "" %>
+    <button class="<%= class %>" <%= click_event %> phx-value-clue="<%= clue %>"><%= clue %></button>
   <% end %>
   <br>
   <button phx-click="done_clues">REMOVE BOXED CLUES</button>

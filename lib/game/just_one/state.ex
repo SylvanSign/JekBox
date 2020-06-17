@@ -71,11 +71,7 @@ defmodule Game.JustOne.State do
       %{
         state
         | step: :compare_clues,
-          clues:
-            clues
-            |> Enum.map(&elem(&1, 1))
-            |> Enum.uniq()
-            |> Enum.into(%{}, &{&1, false})
+          clues: prep_for_clue_comparison(clues)
       }
     end
   end
@@ -83,7 +79,10 @@ defmodule Game.JustOne.State do
   def toggle_duplicate(%{clues: clues} = state, clue) do
     %{
       state
-      | clues: Map.update!(clues, clue, &(not &1))
+      | clues:
+          Map.update!(clues, clue, fn {true, state} ->
+            {true, not state}
+          end)
     }
   end
 
@@ -190,5 +189,31 @@ defmodule Game.JustOne.State do
             a_name < b_name
           end)
     }
+  end
+
+  def prep_for_clue_comparison(clues) do
+    {all, dups} =
+      clues
+      |> Enum.map(&elem(&1, 1))
+      |> Enum.reduce({MapSet.new(), MapSet.new()}, fn clue, {all, dups} ->
+        if MapSet.member?(all, clue) do
+          {all, MapSet.put(dups, clue)}
+        else
+          {MapSet.put(all, clue), dups}
+        end
+      end)
+
+    unique =
+      all
+      |> MapSet.difference(dups)
+      # {true, state} indicates that state can be toggled
+      |> Enum.into(%{}, &{&1, {true, false}})
+
+    dups =
+      dups
+      # {false, state} indicates that state is locked (probably to true)
+      |> Enum.into(%{}, &{&1, {false, true}})
+
+    Map.merge(dups, unique)
   end
 end
