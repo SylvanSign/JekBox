@@ -28,8 +28,8 @@ defmodule Game.Server.Rooms do
   # Server Callbacks
   @impl true
   def init(:ok) do
-    rooms = Map.new()
-    pids = Map.new()
+    rooms = %{}
+    pids = %{}
     {:ok, {rooms, pids}}
   end
 

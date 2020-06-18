@@ -15,7 +15,7 @@ defmodule GameWeb.GameView do
   end
 
   def guesser?(assigns) do
-    assigns.state.cur_pid == self()
+    assigns.state.cur_id == assigns.id
   end
 
   def bold(word) do

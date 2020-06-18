@@ -28,9 +28,14 @@ defmodule GameWeb.GameLive do
       room_pid = Rooms.pid(room)
       GameWeb.Endpoint.subscribe(room)
 
-      case Room.register(room_pid, name) do
+      case Room.register(room_pid, id, name) do
         :ok ->
-          {:ok, assign(socket, room_pid: room_pid)}
+          {:ok,
+           assign(
+             socket,
+             id: id,
+             room_pid: room_pid
+           )}
 
         {:error, error} ->
           {:ok,

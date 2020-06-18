@@ -19,8 +19,8 @@ defmodule Game.Server.Room do
     GenServer.call(pid, :state)
   end
 
-  def register(room, name) do
-    GenServer.call(room, {:register, name})
+  def register(room, id, name) do
+    GenServer.call(room, {:register, id, name})
   end
 
   def start(room) do
@@ -70,7 +70,7 @@ defmodule Game.Server.Room do
   def init(room) do
     :timer.send_after(@timeout, room, :close_if_empty)
 
-    {:ok, Game.JustOne.State.new(room, @words)}
+    {:ok, {Game.JustOne.State.new(room, @words), %{}}}
   end
 
   @impl true
@@ -79,19 +79,20 @@ defmodule Game.Server.Room do
   end
 
   @impl true
-  def handle_call({:register, name}, {pid, _}, state) do
-    {:reply, :ok,
-     state
-     |> register_pid(pid, name)
-     |> broadcast_state()}
+  def handle_call({:register, id, name}, {pid, _}, state) do
+    state =
+      state
+      |> register_pid(pid, id, name)
+      |> broadcast_state()
+
+    {:reply, :ok, state}
   end
 
   @impl true
-  def handle_call(:start, _from, state) do
-    {:reply, :ok,
-     state
-     |> State.start()
-     |> broadcast_state()}
+  def handle_call(:start, _from, {state, pids}) do
+    state = State.start(state)
+    broadcast_state({state, pids})
+    {:reply, :ok, {state, pids}}
   end
 
   @impl true
@@ -178,27 +179,28 @@ defmodule Game.Server.Room do
   end
 
   # Private Helpers
-  defp register_pid(state, pid, name) do
+  defp register_pid({state, pids}, pid, id, name) do
     Process.monitor(pid)
-    State.register_pid(state, pid, name)
+    {State.register_id(state, id, name), Map.put(pids, pid, id)}
   end
 
-  defp forget_pid(state, pid) do
-    %{pids: pids} = state = State.forget_pid(state, pid)
+  defp forget_pid({state, pids}, pid) do
+    id = Map.get(pids, pid)
+    %{ids: ids} = state = State.forget_id(state, id)
 
-    if map_size(pids) == 0 do
+    if map_size(ids) == 0 do
       :timer.send_after(@timeout, :close_if_empty)
     end
 
-    state
+    {state, Map.delete(pids, pid)}
   end
 
-  defp broadcast_state(%{broadcast: true} = state) do
+  defp broadcast_state({%{broadcast: true} = state, pids}) do
     GameWeb.Endpoint.broadcast!(state.room, "state", %{state: state})
-    state
+    {state, pids}
   end
 
-  defp broadcast_state(%{broadcast: false} = state) do
-    state
+  defp broadcast_state({%{broadcast: false} = state, pids}) do
+    {state, pids}
   end
 end

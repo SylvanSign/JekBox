@@ -5,9 +5,9 @@ defmodule Game.JustOne.State do
     %{
       room: room,
       step: :lobby,
-      pids: Map.new(),
-      pid_list: [],
-      cur_pid: nil,
+      ids: Map.new(),
+      id_list: [],
+      cur_id: nil,
       cur_seat: -1,
       cur_word: nil,
       cur_guess: nil,
@@ -30,25 +30,25 @@ defmodule Game.JustOne.State do
 
   def write_clues(
         %{
-          pid_list: pid_list,
+          id_list: id_list,
           cur_seat: cur_seat,
           words: [word | words]
         } = state
       ) do
     clues =
-      pid_list
+      id_list
       |> List.delete_at(cur_seat)
       |> Enum.map(&elem(&1, 0))
       |> Enum.into(%{}, &{&1, ""})
 
-    {cur_pid, guesser_name} = pid_list |> Enum.at(cur_seat)
+    {cur_id, guesser_name} = id_list |> Enum.at(cur_seat)
 
     %{
       state
       | step: :write_clues,
         broadcast: true,
         clues: clues,
-        cur_pid: cur_pid,
+        cur_id: cur_id,
         guesser_name: guesser_name,
         cur_word: word,
         words: words,
@@ -56,8 +56,8 @@ defmodule Game.JustOne.State do
     }
   end
 
-  def clue(%{clues: clues, pending_clues: pending_clues} = state, pid, clue) do
-    clues = Map.put(clues, pid, clue)
+  def clue(%{clues: clues, pending_clues: pending_clues} = state, id, clue) do
+    clues = Map.put(clues, id, clue)
     pending_clues = pending_clues - 1
 
     state = %{
@@ -98,7 +98,7 @@ defmodule Game.JustOne.State do
     }
   end
 
-  def continue_or_end(%{words: words, cur_seat: cur_seat, pid_list: pid_list} = state) do
+  def continue_or_end(%{words: words, cur_seat: cur_seat, id_list: id_list} = state) do
     if Enum.empty?(words) do
       %{
         state
@@ -107,14 +107,14 @@ defmodule Game.JustOne.State do
     else
       %{
         state
-        | cur_seat: next_seat(cur_seat, pid_list)
+        | cur_seat: next_seat(cur_seat, id_list)
       }
       |> write_clues()
     end
   end
 
-  def next_seat(cur_seat, pid_list) do
-    rem(cur_seat + 1, length(pid_list))
+  def next_seat(cur_seat, id_list) do
+    rem(cur_seat + 1, length(id_list))
   end
 
   def pass(%{lost: lost, cur_word: cur_word} = state) do
@@ -162,29 +162,29 @@ defmodule Game.JustOne.State do
     }
   end
 
-  def register_pid(%{pids: pids} = state, pid, name) do
+  def register_id(%{ids: ids} = state, id, name) do
     %{
       state
-      | pids: Map.put(pids, pid, name)
+      | ids: Map.put(ids, id, name)
     }
     |> fix_state()
   end
 
-  def forget_pid(%{pids: pids} = state, pid) do
-    %{state | pids: Map.delete(pids, pid)}
+  def forget_id(%{ids: ids} = state, id) do
+    %{state | ids: Map.delete(ids, id)}
     |> fix_state()
   end
 
   def fix_state(
         %{
-          pids: pids
+          ids: ids
         } = state
       ) do
     %{
       state
       | broadcast: true,
-        pid_list:
-          pids
+        id_list:
+          ids
           |> Enum.sort(fn {_, a_name}, {_, b_name} ->
             a_name < b_name
           end)
