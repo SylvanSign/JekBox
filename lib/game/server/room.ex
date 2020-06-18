@@ -90,65 +90,76 @@ defmodule Game.Server.Room do
 
   @impl true
   def handle_call(:start, _from, {state, pids}) do
-    state = State.start(state)
-    broadcast_state({state, pids})
-    {:reply, :ok, {state, pids}}
+    new_state =
+      {State.start(state), pids}
+      |> broadcast_state()
+
+    {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_call({:clue, clue}, {pid, _}, state) do
-    {:reply, :ok,
-     state
-     |> State.clue(pid, clue)
-     |> broadcast_state()}
+  def handle_call({:clue, clue}, {pid, _}, {state, pids}) do
+    id = pids[pid]
+
+    new_state =
+      {State.clue(state, id, clue), pids}
+      |> broadcast_state()
+
+    {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_call({:toggle_duplicate, clue}, _from, state) do
-    {:reply, :ok,
-     state
-     |> State.toggle_duplicate(clue)
-     |> broadcast_state()}
+  def handle_call({:toggle_duplicate, clue}, _from, {state, pids}) do
+    new_state =
+      {State.toggle_duplicate(state, clue), pids}
+      |> broadcast_state()
+
+    {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_call(:done_clues, _from, state) do
-    {:reply, :ok,
-     state
-     |> State.done_clues()
-     |> broadcast_state()}
+  def handle_call(:done_clues, _from, {state, pids}) do
+    new_state =
+      {State.done_clues(state), pids}
+      |> broadcast_state()
+
+    {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_call({:guess, guess}, _from, state) do
-    {:reply, :ok,
-     state
-     |> State.guess(guess)
-     |> broadcast_state()}
+  def handle_call({:guess, guess}, _from, {state, pids}) do
+    new_state =
+      {State.guess(state, guess), pids}
+      |> broadcast_state()
+
+    {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_call(:pass, _from, state) do
-    {:reply, :ok,
-     state
-     |> State.pass()
-     |> broadcast_state()}
+  def handle_call(:pass, _from, {state, pids}) do
+    new_state =
+      {State.pass(state), pids}
+      |> broadcast_state()
+
+    {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_call(:correct, _from, state) do
-    {:reply, :ok,
-     state
-     |> State.correct()
-     |> broadcast_state()}
+  def handle_call(:correct, _from, {state, pids}) do
+    new_state =
+      {State.correct(state), pids}
+      |> broadcast_state()
+
+    {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_call(:incorrect, _from, state) do
-    {:reply, :ok,
-     state
-     |> State.incorrect()
-     |> broadcast_state()}
+  def handle_call(:incorrect, _from, {state, pids}) do
+    new_state =
+      {State.incorrect(state), pids}
+      |> broadcast_state()
+
+    {:reply, :ok, new_state}
   end
 
   @impl true
@@ -167,13 +178,13 @@ defmodule Game.Server.Room do
   end
 
   @impl true
-  def handle_info(:close_if_empty, %{pids: pids} = state)
+  def handle_info(:close_if_empty, {_, pids} = state)
       when map_size(pids) > 0 do
     {:noreply, state}
   end
 
   @impl true
-  def handle_info(:close_if_empty, %{room: room} = state) do
+  def handle_info(:close_if_empty, {%{room: room}, _pids} = state) do
     IO.puts("Room #{room} shutting down after timing out")
     {:stop, :shutdown, state}
   end
@@ -185,7 +196,7 @@ defmodule Game.Server.Room do
   end
 
   defp forget_pid({state, pids}, pid) do
-    id = Map.get(pids, pid)
+    id = pids[pid]
     %{ids: ids} = state = State.forget_id(state, id)
 
     if map_size(ids) == 0 do

@@ -19,6 +19,7 @@ defmodule GameWeb.GameLive do
       assign(socket,
         # TODO remove this and part of template before launch
         room: room,
+        id: id,
         name: name,
         state: %{}
       )
@@ -33,7 +34,6 @@ defmodule GameWeb.GameLive do
           {:ok,
            assign(
              socket,
-             id: id,
              room_pid: room_pid
            )}
 

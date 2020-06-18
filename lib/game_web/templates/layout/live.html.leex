@@ -7,14 +7,16 @@
     phx-click="lv:clear-flash"
     phx-value-key="error"><%= live_flash(@flash, :error) %></p>
 
+  <%= @inner_content %>
   <%# START TODO remove debugging info before launch %>
   <%= if false do %>
   <pre>
+    <%= "ID: #{inspect(@id)}" %>
+    <br>
     <%= for {k, v} <- @state do %>
       <%= inspect(k) %> <%= inspect(v) %>
     <% end %>
   </pre>
   <% end %>
   <%# END TODO %>
-  <%= @inner_content %>
 </main>
