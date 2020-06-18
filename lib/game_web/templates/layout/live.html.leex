@@ -8,7 +8,7 @@
     phx-value-key="error"><%= live_flash(@flash, :error) %></p>
 
   <%# START TODO remove debugging info before launch %>
-  <%= if true do %>
+  <%= if false do %>
   <pre>
     <%= for {k, v} <- @state do %>
       <%= inspect(k) %> <%= inspect(v) %>
