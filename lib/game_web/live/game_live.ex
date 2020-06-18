@@ -45,7 +45,6 @@ defmodule GameWeb.GameLive do
   @impl true
   def handle_event("start", _event, socket) do
     Room.start(socket.assigns.room_pid)
-
     {:noreply, socket}
   end
 
