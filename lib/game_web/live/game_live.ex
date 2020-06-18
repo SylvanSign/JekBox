@@ -61,7 +61,7 @@ defmodule GameWeb.GameLive do
       |> String.trim()
       |> String.upcase()
 
-    unless Enum.empty?(clue) do
+    unless clue == "" do
       Room.clue(socket.assigns.room_pid, clue)
     end
 
@@ -93,7 +93,7 @@ defmodule GameWeb.GameLive do
       |> String.trim()
       |> String.upcase()
 
-    unless Enum.empty?(guess) do
+    unless guess == "" do
       Room.guess(socket.assigns.room_pid, guess)
     end
 
