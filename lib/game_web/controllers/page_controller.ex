@@ -57,7 +57,7 @@ defmodule GameWeb.PageController do
       nil ->
         render(conn, "name.html", to: Routes.page_path(conn, :game, room))
 
-      name ->
+      _ ->
         if Rooms.exists?(room) do
           live_render(conn, GameWeb.GameLive, session: %{"room" => room})
         else

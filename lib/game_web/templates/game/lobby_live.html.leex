@@ -1,0 +1,8 @@
+<h1>Room: <%= @room %></h1>
+<h2>Players</h2>
+<ul>
+<%= for {_, name} <- @state.pid_list do %>
+  <li><%= name %></li>
+<% end %>
+</ul>
+<button phx-click="start">START GAME</button>

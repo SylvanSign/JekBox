@@ -1,0 +1,18 @@
+<% score = length(@state.scored) %>
+
+<h2><%= bold("=== GAME OVER ===") %></h2>
+<h2><%= bold("FINAL SCORE") %>: <%= bold("#{score} / #{@state.word_count}") %></h2>
+<%= score |> score_message() |> present_word() %>
+<h3><%= bold("SCORED") %> Words</h3>
+<ul>
+  <%= for scored <- @state.scored do %>
+    <li><%= bold(scored) %></li>
+  <% end %>
+</ul>
+<h3><%= bold("LOST") %> Words</h3>
+<ul>
+  <%= for lost <- @state.lost do %>
+    <li><%= bold(lost) %></li>
+  <% end %>
+</ul>
+<%# TODO make this better with rulebook words about final score %>

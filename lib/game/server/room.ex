@@ -3,7 +3,7 @@ defmodule Game.Server.Room do
   alias Game.JustOne.State
 
   @words 13
-  @timeout 5000
+  @timeout 10_000
 
   # Client API
   def start_link(room) do

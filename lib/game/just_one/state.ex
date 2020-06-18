@@ -1,7 +1,7 @@
 defmodule Game.JustOne.State do
   alias Game.JustOne
 
-  def new(room, words \\ 13) do
+  def new(room, word_count \\ 13) do
     %{
       room: room,
       step: :lobby,
@@ -11,9 +11,12 @@ defmodule Game.JustOne.State do
       cur_seat: -1,
       cur_word: nil,
       cur_guess: nil,
-      words: JustOne.Words.new(words),
+      guesser_name: nil,
+      words: JustOne.Words.new(word_count),
+      word_count: word_count,
       broadcast: true,
       clues: %{},
+      dups: [],
       pending_clues: 0,
       scored: [],
       lost: []
@@ -38,12 +41,15 @@ defmodule Game.JustOne.State do
       |> Enum.map(&elem(&1, 0))
       |> Enum.into(%{}, &{&1, ""})
 
+    {cur_pid, guesser_name} = pid_list |> Enum.at(cur_seat)
+
     %{
       state
       | step: :write_clues,
         broadcast: true,
         clues: clues,
-        cur_pid: pid_list |> Enum.at(cur_seat) |> elem(0),
+        cur_pid: cur_pid,
+        guesser_name: guesser_name,
         cur_word: word,
         words: words,
         pending_clues: map_size(clues)
@@ -63,14 +69,13 @@ defmodule Game.JustOne.State do
     unless pending_clues == 0 do
       state
     else
+      {clues, dups} = prep_for_clue_comparison(clues)
+
       %{
         state
         | step: :compare_clues,
-          clues:
-            clues
-            |> Enum.map(&elem(&1, 1))
-            |> Enum.uniq()
-            |> Enum.into(%{}, &{&1, false})
+          clues: clues,
+          dups: dups
       }
     end
   end
@@ -115,16 +120,16 @@ defmodule Game.JustOne.State do
   def pass(%{lost: lost, cur_word: cur_word} = state) do
     %{
       state
-      | lost: [cur_word | lost]
+      | lost: [cur_word | lost],
+        step: :pass
     }
-    |> continue_or_end()
   end
 
   def guess(%{cur_word: guess, scored: scored} = state, guess) do
     %{
       state
       | scored: [guess | scored],
-        step: :correct_guess
+        step: :right
     }
   end
 
@@ -145,9 +150,9 @@ defmodule Game.JustOne.State do
     %{
       state
       | lost: [next_word, cur_word | lost],
-        words: words
+        words: words,
+        step: :wrong
     }
-    |> continue_or_end()
   end
 
   def incorrect(%{cur_word: cur_word, lost: lost, words: []} = state) do
@@ -155,7 +160,6 @@ defmodule Game.JustOne.State do
       state
       | lost: [cur_word | lost]
     }
-    |> continue_or_end()
   end
 
   def register_pid(%{pids: pids} = state, pid, name) do
@@ -185,5 +189,32 @@ defmodule Game.JustOne.State do
             a_name < b_name
           end)
     }
+  end
+
+  def prep_for_clue_comparison(clues) do
+    {clues, dups} =
+      clues
+      |> Enum.map(&elem(&1, 1))
+      |> Enum.reduce({%{}, %{}}, fn clue, {all, dups} ->
+        if Map.has_key?(all, clue) do
+          {all, Map.update(dups, clue, 2, &(&1 + 1))}
+        else
+          {Map.put(all, clue, false), dups}
+        end
+      end)
+
+    clues =
+      clues
+      |> Enum.reject(&Map.has_key?(dups, elem(&1, 0)))
+      |> Enum.into(%{})
+
+    dups =
+      dups
+      |> Enum.map(fn {dup, times} ->
+        List.duplicate(dup, times)
+      end)
+      |> Enum.concat()
+
+    {clues, dups}
   end
 end

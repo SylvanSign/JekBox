@@ -4,12 +4,20 @@ defmodule GameWeb.GameLive do
   alias Game.Server.Room
 
   @impl true
+  def render(%{state: %{step: step}} = assigns) do
+    GameWeb.GameView.render("#{step}_live.html", assigns)
+  end
+
+  @impl true
+  def render(_) do
+    GameWeb.GameView.render("loading.html")
+  end
+
+  @impl true
   def mount(:not_mounted_at_router, %{"room" => room, "name" => name}, socket) do
     socket =
       assign(socket,
         # TODO remove this and part of template before launch
-        # debug: true,
-        debug: false,
         room: room,
         name: name,
         state: %{}
@@ -37,7 +45,6 @@ defmodule GameWeb.GameLive do
   @impl true
   def handle_event("start", _event, socket) do
     Room.start(socket.assigns.room_pid)
-
     {:noreply, socket}
   end
 

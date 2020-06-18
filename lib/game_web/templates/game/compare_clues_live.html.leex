@@ -1,0 +1,16 @@
+<%= preamble(assigns) %>
+
+<%= unless guesser?(assigns) do %>
+  <%= present_word(@state.cur_word) %>
+  <%= for dup <- @state.dups do %>
+    <button class="button-outline"><%= dup %></button>
+  <% end %>
+  <%= for {clue, selected} <- @state.clues do %>
+    <% class = unless selected, do: "button-clear", else: "button-outline" %>
+    <button class="<%= class %>" phx-click="toggle_duplicate" phx-value-clue="<%= clue %>"><%= clue %></button>
+  <% end %>
+  <br>
+  <button phx-click="done_clues">REMOVE DUPLICATE (BOXED) CLUES</button>
+<% else %>
+<h3>Waiting for clue comparison, removing of duplicates, etc.</h3>
+<% end %>

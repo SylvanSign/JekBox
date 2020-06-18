@@ -2,7 +2,7 @@ defmodule Game.Server.Rooms do
   use GenServer
 
   @chars String.codepoints("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-  @length_of_room_name 4
+  @length_of_room_name 1
 
   # Client API
   def start_link(opts) do
