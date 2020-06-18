@@ -3,7 +3,6 @@
 <%= preamble(assigns) %>
 
 <%= unless Enum.empty?(@state.clues) do %>
-  <h3><%= bold("GUESS") %>from clues</h3>
   <%= for clue <- @state.clues do %>
     <button class="button-clear"><%= clue %></button>
   <% end %>
@@ -14,6 +13,8 @@
     </form>
     <h3>or <%= bold("PASS") %></h3>
     <button phx-click="pass">PASS</button>
+  <% else %>
+    <h3><%= name %> will try to <%= bold("GUESS") %></h3>
   <% end %>
 <% else %>
   <h3>You must <%= bold("PASS") %> on this Mystery Word since all clues were duplicates</h3>
