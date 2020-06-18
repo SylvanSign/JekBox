@@ -59,7 +59,18 @@ defmodule GameWeb.PageController do
 
       _ ->
         if Rooms.exists?(room) do
-          live_render(conn, GameWeb.GameLive, session: %{"room" => room})
+          old_room = get_session(conn, :room)
+
+          IO.puts(">>>>> Old room: #{old_room} - New room: #{room}")
+
+          if old_room == room do
+            live_render(conn, GameWeb.GameLive, session: %{"room" => room})
+          else
+            conn
+            |> put_session(:room, room)
+            |> put_session(:id, System.unique_integer())
+            |> live_render(GameWeb.GameLive, session: %{"room" => room})
+          end
         else
           redirect(conn, to: Routes.page_path(conn, :home))
         end

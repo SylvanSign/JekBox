@@ -14,7 +14,7 @@ defmodule GameWeb.GameLive do
   end
 
   @impl true
-  def mount(:not_mounted_at_router, %{"room" => room, "name" => name}, socket) do
+  def mount(:not_mounted_at_router, %{"room" => room, "name" => name, "id" => id}, socket) do
     socket =
       assign(socket,
         # TODO remove this and part of template before launch
@@ -24,6 +24,7 @@ defmodule GameWeb.GameLive do
       )
 
     if connected?(socket) do
+      IO.puts(">>>>> Room: #{room} - Name: #{name} - Id: #{id}")
       room_pid = Rooms.pid(room)
       GameWeb.Endpoint.subscribe(room)
 
