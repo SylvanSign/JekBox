@@ -56,7 +56,15 @@ defmodule GameWeb.GameLive do
 
   @impl true
   def handle_event("clue", %{"clue" => %{"clue" => clue}}, socket) do
-    Room.clue(socket.assigns.room_pid, clue)
+    clue =
+      clue
+      |> String.trim()
+      |> String.upcase()
+
+    unless Enum.empty?(clue) do
+      Room.clue(socket.assigns.room_pid, clue)
+    end
+
     {:noreply, socket}
   end
 
@@ -80,7 +88,15 @@ defmodule GameWeb.GameLive do
 
   @impl true
   def handle_event("guess", %{"guess" => %{"guess" => guess}}, socket) do
-    Room.guess(socket.assigns.room_pid, guess)
+    guess =
+      guess
+      |> String.trim()
+      |> String.upcase()
+
+    unless Enum.empty?(guess) do
+      Room.guess(socket.assigns.room_pid, guess)
+    end
+
     {:noreply, socket}
   end
 

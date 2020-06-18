@@ -28,11 +28,6 @@ defmodule Game.Server.Room do
   end
 
   def clue(room, clue) do
-    clue =
-      clue
-      |> String.trim()
-      |> String.upcase()
-
     GenServer.call(room, {:clue, clue})
   end
 
@@ -45,11 +40,6 @@ defmodule Game.Server.Room do
   end
 
   def guess(room, guess) do
-    guess =
-      guess
-      |> String.trim()
-      |> String.upcase()
-
     GenServer.call(room, {:guess, guess})
   end
 
