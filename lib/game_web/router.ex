@@ -17,12 +17,9 @@ defmodule GameWeb.Router do
   scope "/", GameWeb do
     pipe_through :browser
 
-    get "/play", PageController, :play
-
     get "/", PageController, :home
     get "/new", PageController, :new
     get "/join", PageController, :join
-
     get "/rooms/:room", PageController, :game
 
     post "/name", PageController, :name

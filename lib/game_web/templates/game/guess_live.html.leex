@@ -1,5 +1,7 @@
 <% name = if guesser?(assigns), do: "YOU", else: @state.guesser_name %>
 
+<%= preamble(assigns) %>
+
 <%= unless Enum.empty?(@state.clues) do %>
   <h3><%= bold("GUESS") %>from clues</h3>
   <%= for clue <- @state.clues do %>
