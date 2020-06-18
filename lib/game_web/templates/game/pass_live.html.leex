@@ -1,0 +1,5 @@
+<%= present_word(@state.cur_word) %>
+<h3>was passed over</h3>
+<%= if guesser?(assigns) do %>
+  <button phx-click="start">CONTINUE</button>
+<% end %>

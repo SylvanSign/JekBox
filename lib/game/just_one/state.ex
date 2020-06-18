@@ -120,16 +120,16 @@ defmodule Game.JustOne.State do
   def pass(%{lost: lost, cur_word: cur_word} = state) do
     %{
       state
-      | lost: [cur_word | lost]
+      | lost: [cur_word | lost],
+        step: :pass
     }
-    |> continue_or_end()
   end
 
   def guess(%{cur_word: guess, scored: scored} = state, guess) do
     %{
       state
       | scored: [guess | scored],
-        step: :correct_guess
+        step: :right
     }
   end
 
@@ -150,9 +150,9 @@ defmodule Game.JustOne.State do
     %{
       state
       | lost: [next_word, cur_word | lost],
-        words: words
+        words: words,
+        step: :wrong
     }
-    |> continue_or_end()
   end
 
   def incorrect(%{cur_word: cur_word, lost: lost, words: []} = state) do
@@ -160,7 +160,6 @@ defmodule Game.JustOne.State do
       state
       | lost: [cur_word | lost]
     }
-    |> continue_or_end()
   end
 
   def register_pid(%{pids: pids} = state, pid, name) do

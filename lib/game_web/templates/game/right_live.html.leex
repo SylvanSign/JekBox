@@ -1,0 +1,7 @@
+<%= present_word(@state.cur_word) %>
+<h3>was guessed correctly!</h3>
+<h3><%= bold("WELL DONE!") %></h3>
+
+<%= if guesser?(assigns) do %>
+  <button phx-click="start">CONTINUE</button>
+<% end %>

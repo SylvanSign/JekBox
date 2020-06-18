@@ -1,0 +1,10 @@
+<h2>Please check your guess</h2>
+<h3>Mystery Word</h3>
+<%= present_word(@state.cur_word) %>
+<h3>Your guess</h3>
+<%= present_word(@state.cur_guess) %>
+
+<%= if guesser?(assigns) do %>
+  <button phx-click="correct">I WAS RIGHT</button>
+  <button phx-click="incorrect">I WAS WRONG</button>
+<% end %>

@@ -4,23 +4,8 @@ defmodule GameWeb.GameLive do
   alias Game.Server.Room
 
   @impl true
-  def render(%{state: %{step: :lobby}} = assigns) do
-    GameWeb.GameView.render("lobby_live.html", assigns)
-  end
-
-  @impl true
-  def render(%{state: %{step: :write_clues}} = assigns) do
-    GameWeb.GameView.render("write_clues_live.html", assigns)
-  end
-
-  @impl true
-  def render(%{state: %{step: :compare_clues}} = assigns) do
-    GameWeb.GameView.render("compare_clues_live.html", assigns)
-  end
-
-  @impl true
-  def render(%{state: %{step: :guess}} = assigns) do
-    GameWeb.GameView.render("guess_live.html", assigns)
+  def render(%{state: %{step: step}} = assigns) do
+    GameWeb.GameView.render("#{step}_live.html", assigns)
   end
 
   @impl true

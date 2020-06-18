@@ -1,0 +1,11 @@
+<%= present_word(@state.cur_word) %>
+<h3>was <%= bold("NOT") %> guessed correctly</h3>
+
+<%= if length(@state.words) > 0 do %>
+  <%= present_word(hd(@state.lost)) %>
+  <h3>was also lost because of that guess</h3>
+<% end %>
+
+<%= if guesser?(assigns) do %>
+  <button phx-click="start">CONTINUE</button>
+<% end %>
