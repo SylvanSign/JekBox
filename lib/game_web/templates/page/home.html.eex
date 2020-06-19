@@ -1,4 +1,4 @@
 <h1>Just One!</h1>
 <h2>Welcome, <%= @name %></h2>
-<%= link("JOIN GAME", to: Routes.page_path(@conn, :join), class: "button") %>
-<%= link("NEW GAME", to: Routes.page_path(@conn, :new), class: "button button-outline") %>
+<a href="<%= Routes.page_path(@conn, :join) %>"><button>JOIN GAME</button></a>
+<a href="<%= Routes.page_path(@conn, :new) %>"><button class="button-outline">NEW GAME</button></a>

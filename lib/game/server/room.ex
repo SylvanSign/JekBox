@@ -3,7 +3,7 @@ defmodule Game.Server.Room do
   alias Game.JustOne.State
 
   @words 13
-  @timeout 10_000
+  @timeout 30_000
 
   # Client API
   def start_link(room) do
@@ -47,12 +47,12 @@ defmodule Game.Server.Room do
     GenServer.call(room, :pass)
   end
 
-  def correct(room) do
-    GenServer.call(room, :correct)
+  def right(room) do
+    GenServer.call(room, :right)
   end
 
-  def incorrect(room) do
-    GenServer.call(room, :incorrect)
+  def wrong(room) do
+    GenServer.call(room, :wrong)
   end
 
   # Server Callbacks
@@ -135,18 +135,18 @@ defmodule Game.Server.Room do
   end
 
   @impl true
-  def handle_call(:correct, _from, {state, pids}) do
+  def handle_call(:right, _from, {state, pids}) do
     new_state =
-      {State.correct(state), pids}
+      {State.right(state), pids}
       |> broadcast_state()
 
     {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_call(:incorrect, _from, {state, pids}) do
+  def handle_call(:wrong, _from, {state, pids}) do
     new_state =
-      {State.incorrect(state), pids}
+      {State.wrong(state), pids}
       |> broadcast_state()
 
     {:reply, :ok, new_state}

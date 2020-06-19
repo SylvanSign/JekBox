@@ -129,6 +129,7 @@ defmodule Game.JustOne.State do
     %{
       state
       | scored: [guess | scored],
+        cur_guess: guess,
         step: :right
     }
   end
@@ -136,29 +137,30 @@ defmodule Game.JustOne.State do
   def guess(state, guess) do
     %{
       state
-      | step: :check_guess,
+      | step: :probably_wrong,
         cur_guess: guess
     }
   end
 
-  def correct(%{cur_word: cur_word} = state) do
-    # Pretend we guessed correctly
+  def right(%{cur_word: cur_word} = state) do
+    # Pretend we guessed rightly
     guess(state, cur_word)
   end
 
-  def incorrect(%{cur_word: cur_word, lost: lost, words: [next_word | words]} = state) do
+  def wrong(%{cur_word: cur_word, lost: lost, words: [next_word | words]} = state) do
     %{
       state
       | lost: [next_word, cur_word | lost],
         words: words,
-        step: :wrong
+        step: :actually_wrong
     }
   end
 
-  def incorrect(%{cur_word: cur_word, lost: lost, words: []} = state) do
+  def wrong(%{cur_word: cur_word, lost: lost, words: []} = state) do
     %{
       state
-      | lost: [cur_word | lost]
+      | lost: [cur_word | lost],
+        step: :actually_wrong
     }
   end
 

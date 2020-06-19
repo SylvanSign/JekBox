@@ -1,11 +1,11 @@
 <%= preamble(assigns) %>
 
+<h2>Because your guess was <%= bold("WRONG,") %> you lost</h2>
 <%= present_word(@state.cur_word) %>
-<h3>was <%= bold("NOT") %> guessed correctly</h3>
 
 <%= if length(@state.words) > 0 do %>
+  <h2>and as an extra penalty, you also lost</h2>
   <%= present_word(hd(@state.lost)) %>
-  <h3>was also lost because of that guess</h3>
 <% end %>
 
 <%= if guesser?(assigns) do %>

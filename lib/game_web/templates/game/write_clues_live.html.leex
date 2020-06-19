@@ -1,9 +1,11 @@
 <%= preamble(assigns) %>
 
 <%= if @state.clues[@id] == "" do %>
+  <h2>Mystery Word</h2>
   <%= present_word(@state.cur_word) %>
   <%= f = form_for :clue, "", [phx_submit: "clue"] %>
-    <%= text_input f, :clue, autofocus: true, placeholder: "ENTER ONE WORD CLUE for '#{@state.cur_word}'", style: "text-transform:uppercase", maxLength: 30, autocapitalize: "off", autocorrect: "off", autocomplete: "off" %>
+    <%= label f, :clue, "One word clue" %>
+    <%= text_input f, :clue, autofocus: true, required: true, pattern: "^\s*[^ ]+\s*$", title: "Clue must be one word only", placeholder: "ENTER ONE WORD CLUE for '#{@state.cur_word}'", style: "text-transform:uppercase", maxLength: 30, autocapitalize: "off", autocorrect: "off", autocomplete: "off" %>
     <%= submit "SUBMIT" %>
   </form>
 <% else %>

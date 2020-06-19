@@ -61,10 +61,7 @@ defmodule GameWeb.GameLive do
       |> String.trim()
       |> String.upcase()
 
-    unless clue == "" do
-      Room.clue(socket.assigns.room_pid, clue)
-    end
-
+    Room.clue(socket.assigns.room_pid, clue)
     {:noreply, socket}
   end
 
@@ -93,22 +90,19 @@ defmodule GameWeb.GameLive do
       |> String.trim()
       |> String.upcase()
 
-    unless guess == "" do
-      Room.guess(socket.assigns.room_pid, guess)
-    end
-
+    Room.guess(socket.assigns.room_pid, guess)
     {:noreply, socket}
   end
 
   @impl true
-  def handle_event("correct", _event, socket) do
-    Room.correct(socket.assigns.room_pid)
+  def handle_event("right", _event, socket) do
+    Room.right(socket.assigns.room_pid)
     {:noreply, socket}
   end
 
   @impl true
-  def handle_event("incorrect", _event, socket) do
-    Room.incorrect(socket.assigns.room_pid)
+  def handle_event("wrong", _event, socket) do
+    Room.wrong(socket.assigns.room_pid)
     {:noreply, socket}
   end
 
