@@ -3,11 +3,6 @@ defmodule GameWeb.PageController do
   alias Game.Server.Rooms
   import Phoenix.LiveView.Controller
 
-  # TODO make a more intuitve "name change" workflow
-  def home(conn, %{"change" => _}) do
-    render(conn, "name.html", to: Routes.page_path(conn, :home))
-  end
-
   def home(conn, _params) do
     case get_session(conn, :name) do
       nil ->
@@ -24,6 +19,10 @@ defmodule GameWeb.PageController do
     conn
     |> put_session(:name, name)
     |> redirect(to: to)
+  end
+
+  def name(conn, _params) do
+    render(conn, "name.html", to: Routes.page_path(conn, :home))
   end
 
   def new(conn, _params) do

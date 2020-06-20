@@ -1,7 +1,7 @@
 <% score = length(@state.scored) %>
 
 <h2><%= bold("=== GAME OVER ===") %></h2>
-<h2><%= bold("FINAL SCORE") %>: <%= bold("#{score} / #{@state.word_count}") %></h2>
+<h2><%= bold("FINAL SCORE:") %> <%= bold("#{score} / #{@state.word_count}") %></h2>
 <%= score |> score_message() |> present_word() %>
 <h2><%= bold("SCORED") %> Words</h2>
 <ul>
