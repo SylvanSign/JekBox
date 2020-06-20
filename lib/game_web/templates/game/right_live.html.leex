@@ -1,10 +1,8 @@
 <%= preamble(assigns) %>
 
-<h2>Your guess was <%= bold("RIGHT!") %></h2>
-<h2>Mystery Word</h2>
+<h2>The guess was <%= bold("RIGHT!") %></h2>
+<h2>Mystery Word:</h2>
 <%= present_word(@state.cur_word) %>
-<h2>Your guess</h2>
-<%= present_word(@state.cur_guess) %>
 
 <h2><%= bold("WELL DONE!") %></h2>
 

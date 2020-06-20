@@ -7,6 +7,13 @@
     phx-click="lv:clear-flash"
     phx-value-key="error"><%= live_flash(@flash, :error) %></p>
 
+  <div>
+    Game Info:
+    <%= link "Publisher Site", to: "https://justone-the-game.com/index.php?lang=en" %>
+    ·
+    <%= link "BGG Page", to: "https://boardgamegeek.com/boardgame/254640/just-one" %>
+  </div>
+
   <%= @inner_content %>
   <%# START TODO remove debugging info before launch %>
   <%= if false do %>

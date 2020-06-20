@@ -1,22 +1,31 @@
 <% name = if guesser?(assigns), do: "YOU", else: @state.guesser_name %>
 
 <%= preamble(assigns) %>
+<% last_word? = length(@state.words) == 0 %>
 
-<%= unless Enum.empty?(@state.clues) do %>
-  <h2>Your clues</h2>
+<%= unless Enum.empty?(@state.clues) and not last_word? do %>
+  <%= unless Enum.empty?(@state.clues) do %>
+    <h2>Your clues:</h2>
+  <% else %>
+    <h2>No clues survived, but you can still take a wild guess on this last word</h2>
+  <% end %>
   <%= for clue <- @state.clues do %>
     <button class="button-clear"><%= clue %></button>
   <% end %>
   <%= if guesser?(assigns) do %>
     <%= f = form_for :guess, "", [phx_submit: "guess"] %>
-      <%= label f, :guess, "Take a guess?" %>
+      <% warning = unless last_word?, do: ~e{If <em>WRONG</em>, lose next word too}, else: ~e{No penalty for GUESS on <em>last word</em>} %>
+      <label for="guess"><%= bold("GUESS?") %><%= warning %></label>
       <%= text_input f, :guess, autofocus: true, required: true, pattern: "^\s*[^ ]+\s*$", title: "Guess must be one word only", placeholder: "GUESS MYSTERY WORD", style: "text-transform:uppercase", maxLength: 30, autocapitalize: "off", autocorrect: "off", autocomplete: "off" %>
       <%= submit "GUESS" %>
     </form>
-    <label for="foo">or Pass?</label>
-    <button phx-click="pass" id="foo">PASS</button>
+
+    <%= unless last_word? do %>
+      <label for="foo"><%= bold("PASS") %> and lose <em>just</em> this word</label>
+      <button phx-click="pass" id="foo">PASS</button>
+    <% end %>
   <% else %>
-    <h2><%= name %> will try to <%= bold("GUESS") %></h2>
+    <h2><%= name %> is thinking...</h2>
   <% end %>
 <% else %>
   <h2>You must <%= bold("PASS") %> on this Mystery Word since all clues were duplicates</h2>

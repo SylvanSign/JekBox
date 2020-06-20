@@ -2,7 +2,7 @@ defmodule Game.Server.Room do
   use GenServer, restart: :temporary
   alias Game.JustOne.State
 
-  @words 13
+  @words 1
   @timeout 30_000
 
   # Client API

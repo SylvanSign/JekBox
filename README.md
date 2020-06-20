@@ -17,3 +17,10 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Docs: https://hexdocs.pm/phoenix
   * Forum: https://elixirforum.com/c/phoenix-forum
   * Source: https://github.com/phoenixframework/phoenix
+
+## Credits
+Games
+- Just One
+  - Official Site: https://justone-the-game.com/index.php?lang=en
+  - BGG page: https://boardgamegeek.com/boardgame/254640/just-one
+[favicon By Joel Wisneski](https://thenounproject.com/joelski/)

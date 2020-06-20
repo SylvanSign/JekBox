@@ -17,7 +17,7 @@ defmodule GameWeb.GameLive do
   def mount(:not_mounted_at_router, %{"room" => room, "name" => name, "id" => id}, socket) do
     socket =
       assign(socket,
-        # TODO remove this and part of template before launch
+        page_title: "Just One",
         room: room,
         id: id,
         name: name,

@@ -4,11 +4,11 @@ defmodule GameWeb.GameView do
   def preamble(assigns) do
     ~L"""
     <%= if @state.step != :lobby and @state.step != :end do %>
-      <h1>On Word <%= @state.word_count - length(@state.words) %> of <%= @state.word_count %></h1>
+      <h1>Word <%= bold(@state.word_count - length(@state.words)) %> of <%= bold(@state.word_count) %></h1>
       <%= if guesser?(assigns) do %>
-        <h2>You are the <%= bold("Guesser") %></h2>
+        <h2><%= bold("Guesser") %></h2>
       <% else %>
-        <h2>You are a <%= bold("Clue Giver") %> for <%= tag_guesser(@state.guesser_name) %></h2>
+        <h2><%= bold("Clue Giver") %> for <%= tag_guesser(@state.guesser_name) %></h2>
       <% end %>
     <% end %>
     """
