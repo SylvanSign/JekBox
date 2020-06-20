@@ -69,13 +69,17 @@ defmodule Game.Server.Room do
   end
 
   @impl true
-  def handle_call({:register, id, name}, {pid, _}, state) do
-    state =
-      state
-      |> register_pid(pid, id, name)
-      |> broadcast_state()
+  def handle_call({:register, id, name}, {pid, _}, {state, pids}) do
+    if State.allowed_to_register?(state, id) do
+      state =
+        {state, pids}
+        |> register_pid(pid, id, name)
+        |> broadcast_state()
 
-    {:reply, :ok, state}
+      {:reply, :ok, state}
+    else
+      {:reply, {:error, "Can't join game since it's already in progress"}, {state, pids}}
+    end
   end
 
   @impl true

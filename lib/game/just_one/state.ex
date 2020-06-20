@@ -7,6 +7,7 @@ defmodule Game.JustOne.State do
       step: :lobby,
       ids: Map.new(),
       id_list: [],
+      game_ids: [],
       cur_id: nil,
       cur_seat: -1,
       cur_word: nil,
@@ -21,6 +22,11 @@ defmodule Game.JustOne.State do
       scored: [],
       lost: []
     }
+  end
+
+  def start(%{step: :lobby, ids: ids} = state) do
+    %{state | game_ids: ids}
+    |> continue_or_end()
   end
 
   def start(state) do
@@ -164,6 +170,14 @@ defmodule Game.JustOne.State do
     }
   end
 
+  def allowed_to_register?(%{step: :lobby}, _id) do
+    true
+  end
+
+  def allowed_to_register?(%{game_ids: game_ids}, id) do
+    Map.has_key?(game_ids, id)
+  end
+
   def register_id(%{ids: ids} = state, id, name) do
     %{
       state
@@ -187,8 +201,8 @@ defmodule Game.JustOne.State do
       | broadcast: true,
         id_list:
           ids
-          |> Enum.sort(fn {_, a_name}, {_, b_name} ->
-            a_name < b_name
+          |> Enum.sort(fn {a_id, _}, {b_id, _} ->
+            a_id < b_id
           end)
     }
   end

@@ -1,7 +1,7 @@
 <%= preamble(assigns) %>
 
 <%= unless guesser?(assigns) do %>
-  <h2>Mystery Word</h2>
+  <h2>Mystery Word:</h2>
   <%= present_word(@state.cur_word) %>
   <h2>Select any duplicate or invalid clues:</h2>
   <%= for dup <- @state.dups do %>
