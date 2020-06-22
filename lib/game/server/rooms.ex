@@ -1,9 +1,6 @@
 defmodule Game.Server.Rooms do
   use GenServer
 
-  @chars String.codepoints("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-  @length_of_room_name 3
-
   # Client API
   def start_link(opts) do
     GenServer.start_link(__MODULE__, :ok, opts)
@@ -98,12 +95,5 @@ defmodule Game.Server.Rooms do
         raise "Exhausted on room name generation"
       end
     end
-  end
-
-  defp generate_new_name() do
-    Enum.reduce(1..@length_of_room_name, [], fn _i, acc ->
-      [Enum.random(@chars) | acc]
-    end)
-    |> Enum.join("")
   end
 end
