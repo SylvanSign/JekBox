@@ -18,6 +18,24 @@ defmodule GameWeb.GameView do
     assigns.state.cur_id == assigns.id
   end
 
+  def clues(assigns, clickable? \\ false) do
+    ~L"""
+    <%= for dup <- @state.dups do %>
+      <button class="button-outline"><%= dup %></button>
+    <% end %>
+    <%= if clickable? do %>
+      <%= for {clue, selected} <- @state.clues do %>
+        <% class = unless selected, do: "button-clear", else: "button-outline" %>
+        <button class="<%= class %>" phx-click="toggle_duplicate" phx-value-clue="<%= clue %>"><%= clue %></button>
+      <% end %>
+    <% else %>
+      <%= for clue <- @state.clues do %>
+        <button class="button-clear"><%= clue %></button>
+      <% end %>
+    <% end %>
+    """
+  end
+
   def bold(word) do
     ~e"""
     <strong><%= word %></strong>

@@ -1,5 +1,8 @@
 <%= preamble(assigns) %>
 
+<h2>The Clues:</h2>
+<%= clues(assigns) %>
+
 <h2>Because your guess was <%= bold("WRONG,") %> you lost:</h2>
 <%= present_word(@state.cur_word) %>
 

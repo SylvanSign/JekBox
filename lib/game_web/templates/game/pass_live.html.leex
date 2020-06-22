@@ -1,7 +1,9 @@
 <%= preamble(assigns) %>
 
 <h2>You chose to <%= bold("PASS") %></h2>
-<h2>MYSTERY WORD:</h2>
+<h2>The Clues:</h2>
+<%= clues(assigns) %>
+<h2>Mystery Word:</h2>
 <%= present_word(@state.cur_word) %>
 <%= if guesser?(assigns) do %>
   <button phx-click="start">CONTINUE</button>

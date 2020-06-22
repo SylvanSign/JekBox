@@ -4,13 +4,7 @@
   <h2>Mystery Word:</h2>
   <%= present_word(@state.cur_word) %>
   <h2>Select any duplicate or invalid clues:</h2>
-  <%= for dup <- @state.dups do %>
-    <button class="button-outline"><%= dup %></button>
-  <% end %>
-  <%= for {clue, selected} <- @state.clues do %>
-    <% class = unless selected, do: "button-clear", else: "button-outline" %>
-    <button class="<%= class %>" phx-click="toggle_duplicate" phx-value-clue="<%= clue %>"><%= clue %></button>
-  <% end %>
+  <%= clues(assigns, true) %>
   <br>
   <button phx-click="done_clues">REMOVE SELECTED CLUES & CONTINUE</button>
 <% else %>
