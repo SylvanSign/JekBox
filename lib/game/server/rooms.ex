@@ -86,12 +86,14 @@ defmodule Game.Server.Rooms do
     {rooms, pids}
   end
 
-  defp get_unique_room_name(rooms, name \\ generate_new_name(), tries \\ 0) do
+  defp get_unique_room_name(rooms, tries \\ 0) do
+    name = Game.Server.RoomCodes.new()
+
     unless Map.has_key?(rooms, name) do
       {:ok, name}
     else
       unless tries > 1000 do
-        get_unique_room_name(rooms, generate_new_name(), tries + 1)
+        get_unique_room_name(rooms, tries + 1)
       else
         raise "Exhausted on room name generation"
       end
