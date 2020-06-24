@@ -75,4 +75,8 @@ defmodule GameWeb.PageController do
         end
     end
   end
+
+  def javascript(conn, _params) do
+    render(conn, "javascript.html")
+  end
 end

@@ -25,6 +25,8 @@ defmodule GameWeb.Router do
 
     post "/name", PageController, :name
     post "/join", PageController, :join_room
+
+    get "/javascript", PageController, :javascript
   end
 
   # Other scopes may use custom stacks.
