@@ -2,6 +2,15 @@
 @import "./phoenix.css";
 @import "../node_modules/nprogress/nprogress.css";
 
+button.button-clear:focus, button.button-clear:hover {
+  color: #0069d9;
+}
+
+button.button-outline:focus, button.button-outline:hover {
+  color: #0069d9;
+  border-color: #0069d9;
+}
+
 /* LiveView specific classes for your customizations */
 .invalid-feedback {
   color: #a94442;

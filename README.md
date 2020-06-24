@@ -23,4 +23,6 @@ Games
 - Just One
   - Official Site: https://justone-the-game.com/index.php?lang=en
   - BGG page: https://boardgamegeek.com/boardgame/254640/just-one
-[favicon By Joel Wisneski](https://thenounproject.com/joelski/)
+
+## License
+GPLv3: https://www.gnu.org/licenses/gpl-3.0.html

@@ -1,5 +1,14 @@
 <main role="main" class="container">
   <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
   <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+
+  <header>
+    <%= link "Source Code", to: "https://github.com/SylvanSign/game" %>
+    ·
+    <%= link "BGG Page", to: "https://boardgamegeek.com/boardgame/254640/just-one" %>
+    ·
+    <%= link "Publisher Site", to: "https://justone-the-game.com/index.php?lang=en" %>
+  </header>
+
   <%= @inner_content %>
 </main>
