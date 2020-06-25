@@ -1,14 +1,13 @@
 defmodule Game.JekBox.State do
   alias Game.JekBox
 
-  def new(room, word_count \\ 13) do
+  def new(room, strikes \\ 3) do
     %{
       # fields set while in lobby:
       room: room,
       step: :lobby,
       ids: Map.new(),
-      words: JekBox.Words.new(word_count),
-      word_count: word_count,
+      strikes: strikes,
       # everything computed after starting game:
       clues: %{},
       dups: [],
@@ -26,9 +25,9 @@ defmodule Game.JekBox.State do
     }
   end
 
-  def restart(%{room: room, ids: ids, word_count: word_count} = state) do
+  def restart(%{room: room, ids: ids, strikes: strikes} = state) do
     %{
-      new(room, word_count)
+      new(room, strikes)
       | ids: ids
     }
     |> fix_state()
@@ -48,8 +47,7 @@ defmodule Game.JekBox.State do
   def write_clues(
         %{
           id_list: id_list,
-          cur_seat: cur_seat,
-          words: [word | words]
+          cur_seat: cur_seat
         } = state
       ) do
     clues =
@@ -67,8 +65,7 @@ defmodule Game.JekBox.State do
         clues: clues,
         cur_id: cur_id,
         guesser_name: guesser_name,
-        cur_word: word,
-        words: words,
+        cur_word: JekBox.Words.new(),
         pending_clues: map_size(clues)
     }
   end
