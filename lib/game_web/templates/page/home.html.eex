@@ -1,4 +1,4 @@
-<h1>Just One</h1>
+<h1>JekBox Games</h1>
 
 <h2>Welcome, <%= @name %> <sup>(<a href="<%= Routes.page_path(@conn, :name) %>">change</a>)</sup></h2>
 

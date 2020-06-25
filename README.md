@@ -19,10 +19,9 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Source: https://github.com/phoenixframework/phoenix
 
 ## Credits
-Games
-- Just One
-  - Official Site: https://justone-the-game.com/index.php?lang=en
-  - BGG page: https://boardgamegeek.com/boardgame/254640/just-one
+If you like this app, please consider buying a copy of the physical boardgame which inspired it, _Just One_!
+- Official Site: https://justone-the-game.com/index.php?lang=en
+- BGG page: https://boardgamegeek.com/boardgame/254640/just-one
 
 ## License
 GPLv3: https://www.gnu.org/licenses/gpl-3.0.html

@@ -3,11 +3,14 @@
   <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
 
   <header>
-    <%= link "Source Code", to: "https://github.com/SylvanSign/game" %>
+    <%= link "Home", to: Routes.page_path(@conn, :home) %>
     ·
-    <%= link "BGG Page", to: "https://boardgamegeek.com/boardgame/254640/just-one" %>
+    <%= link "Source", to: "https://github.com/SylvanSign/game" %>
+    |
+    inspired by <em>Just One</em>
+    (<%= link "BGG", to: "https://boardgamegeek.com/boardgame/254640/just-one" %>
     ·
-    <%= link "Publisher Site", to: "https://justone-the-game.com/index.php?lang=en" %>
+    <%= link "Official Site", to: "https://justone-the-game.com/index.php?lang=en" %>)
   </header>
 
   <%= @inner_content %>

@@ -1,8 +1,8 @@
 defmodule Game.Server.Room do
   use GenServer, restart: :temporary
-  alias Game.JustOne.State
+  alias Game.JekBox.State
 
-  @words 13
+  @words 1
   @timeout 30_000
 
   # Client API
@@ -25,6 +25,10 @@ defmodule Game.Server.Room do
 
   def start(room) do
     GenServer.call(room, :start)
+  end
+
+  def restart(room) do
+    GenServer.call(room, :restart)
   end
 
   def clue(room, clue) do
@@ -60,7 +64,7 @@ defmodule Game.Server.Room do
   def init(room) do
     :timer.send_after(@timeout, room, :close_if_empty)
 
-    {:ok, {Game.JustOne.State.new(room, @words), %{}}}
+    {:ok, {State.new(room, @words), %{}}}
   end
 
   @impl true
@@ -86,6 +90,15 @@ defmodule Game.Server.Room do
   def handle_call(:start, _from, {state, pids}) do
     new_state =
       {State.start(state), pids}
+      |> broadcast_state()
+
+    {:reply, :ok, new_state}
+  end
+
+  @impl true
+  def handle_call(:restart, _from, {state, pids}) do
+    new_state =
+      {State.restart(state), pids}
       |> broadcast_state()
 
     {:reply, :ok, new_state}

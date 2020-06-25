@@ -1,4 +1,4 @@
-defmodule Game.JustOne.Words do
+defmodule Game.JekBox.Words do
   def new(num_words \\ 13) do
     file_path()
     |> File.read!()

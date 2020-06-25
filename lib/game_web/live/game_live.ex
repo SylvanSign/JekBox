@@ -107,6 +107,12 @@ defmodule GameWeb.GameLive do
   end
 
   @impl true
+  def handle_event("restart", _event, socket) do
+    Room.restart(socket.assigns.room_pid)
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info(%{event: "state", payload: %{state: state}}, socket) do
     {:noreply,
      assign(socket,

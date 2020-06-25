@@ -1,27 +1,38 @@
-defmodule Game.JustOne.State do
-  alias Game.JustOne
+defmodule Game.JekBox.State do
+  alias Game.JekBox
 
   def new(room, word_count \\ 13) do
     %{
+      # fields set while in lobby:
       room: room,
       step: :lobby,
       ids: Map.new(),
-      id_list: [],
-      game_ids: [],
+      words: JekBox.Words.new(word_count),
+      word_count: word_count,
+      # everything computed after starting game:
+      clues: %{},
+      dups: [],
+      scored: [],
+      lost: [],
+      pending_clues: 0,
+      broadcast: true,
       cur_id: nil,
       cur_seat: -1,
       cur_word: nil,
       cur_guess: nil,
       guesser_name: nil,
-      words: JustOne.Words.new(word_count),
-      word_count: word_count,
-      broadcast: true,
-      clues: %{},
-      dups: [],
-      pending_clues: 0,
-      scored: [],
-      lost: []
+      game_ids: [],
+      id_list: []
     }
+  end
+
+  def restart(%{room: room, ids: ids, word_count: word_count} = state) do
+    %{
+      new(room, word_count)
+      | ids: ids
+    }
+    |> fix_state()
+    |> start()
   end
 
   def start(%{step: :lobby, ids: ids} = state) do
