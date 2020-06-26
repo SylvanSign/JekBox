@@ -12,5 +12,5 @@
     <%= submit "GUESS" %>
   </form>
 <% else %>
-  <h2><%= @state.guesser_name %> is thinking...</h2>
+  <h2><%= tag_guesser(@state.guesser_name) %> is thinking...</h2>
 <% end %>
