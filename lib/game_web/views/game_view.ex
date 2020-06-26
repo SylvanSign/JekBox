@@ -28,7 +28,7 @@ defmodule GameWeb.GameView do
 
     color =
       case lost do
-        0 -> :green
+        0 -> nil
         _ -> :red
       end
 
