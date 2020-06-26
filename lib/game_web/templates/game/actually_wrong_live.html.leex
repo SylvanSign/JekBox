@@ -1,16 +1,14 @@
 <%= preamble(assigns) %>
 
-<h2>The Clues:</h2>
-<%= clues(assigns) %>
-
-<h2>Because your guess was <%= bold("WRONG,") %> you lost:</h2>
+<h2>You got a <%= bold("STRIKE", :red) %> for missing</h2>
 <%= present_word(@state.cur_word) %>
 
-<%= if length(@state.words) > 0 do %>
-  <h2>and as an extra penalty, you also lost:</h2>
-  <%= present_word(hd(@state.lost)) %>
-<% end %>
+<h2>Your Guess</h2>
+<%= present_word(@state.cur_guess) %>
+<h2>The Clues</h2>
+<%= clues(assigns) %>
 
 <%= if guesser?(assigns) do %>
+  <hr>
   <button phx-click="start">CONTINUE</button>
 <% end %>

@@ -1,13 +1,14 @@
 <%= preamble(assigns) %>
 
-<h2>The guess was <%= bold("RIGHT!") %></h2>
-<h2>The Clues:</h2>
-<%= clues(assigns) %>
-<h2>Mystery Word:</h2>
+<h2>The guess was <%= bold("RIGHT!", :green) %></h2>
+<h2>Mystery Word</h2>
 <%= present_word(@state.cur_word) %>
+<h2>The Clues</h2>
+<%= clues(assigns) %>
 
 <h2><%= bold("WELL DONE!") %></h2>
 
 <%= if guesser?(assigns) do %>
+  <hr>
   <button phx-click="start">CONTINUE</button>
 <% end %>
