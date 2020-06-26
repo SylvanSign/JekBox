@@ -1,10 +1,18 @@
 defmodule Game.JekBox.Words do
-  def new(num_words \\ 13) do
+  use Agent
+
+  def start_link(opts) do
+    Agent.start_link(fn -> new() end, opts)
+  end
+
+  def word do
+    Agent.get(__MODULE__, &Enum.random(&1))
+  end
+
+  defp new do
     file_path()
     |> File.read!()
     |> String.split("\n", trim: true)
-    |> Enum.shuffle()
-    |> Enum.take(num_words)
   end
 
   defp file_path do

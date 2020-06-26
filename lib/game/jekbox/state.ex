@@ -1,14 +1,14 @@
 defmodule Game.JekBox.State do
   alias Game.JekBox
 
-  def new(room, word_count \\ 13) do
+  def new(room, strikes \\ 3) do
     %{
       # fields set while in lobby:
       room: room,
       step: :lobby,
       ids: Map.new(),
-      words: JekBox.Words.new(word_count),
-      word_count: word_count,
+      strikes: strikes,
+      # streak: 0, # TODO would be cool to keep track of "correct streak"
       # everything computed after starting game:
       clues: %{},
       dups: [],
@@ -26,9 +26,9 @@ defmodule Game.JekBox.State do
     }
   end
 
-  def restart(%{room: room, ids: ids, word_count: word_count} = state) do
+  def restart(%{room: room, ids: ids, strikes: strikes}) do
     %{
-      new(room, word_count)
+      new(room, strikes)
       | ids: ids
     }
     |> fix_state()
@@ -45,11 +45,34 @@ defmodule Game.JekBox.State do
     |> continue_or_end()
   end
 
+  def continue_or_end(%{strikes: strikes, lost: lost} = state)
+      when length(lost) == strikes do
+    %{
+      state
+      | step: :end
+    }
+  end
+
+  def continue_or_end(%{step: :pass, cur_seat: cur_seat} = state) do
+    %{
+      state
+      | cur_seat: cur_seat
+    }
+    |> write_clues()
+  end
+
+  def continue_or_end(%{cur_seat: cur_seat, id_list: id_list} = state) do
+    %{
+      state
+      | cur_seat: next_seat(cur_seat, id_list)
+    }
+    |> write_clues()
+  end
+
   def write_clues(
         %{
           id_list: id_list,
-          cur_seat: cur_seat,
-          words: [word | words]
+          cur_seat: cur_seat
         } = state
       ) do
     clues =
@@ -67,8 +90,7 @@ defmodule Game.JekBox.State do
         clues: clues,
         cur_id: cur_id,
         guesser_name: guesser_name,
-        cur_word: word,
-        words: words,
+        cur_word: JekBox.Words.word(),
         pending_clues: map_size(clues)
     }
   end
@@ -104,29 +126,27 @@ defmodule Game.JekBox.State do
     }
   end
 
-  def done_clues(%{clues: clues} = state) do
-    %{
-      state
-      | clues:
-          clues
-          |> Enum.reject(&elem(&1, 1))
-          |> Enum.map(&elem(&1, 0)),
-        step: :guess
-    }
-  end
+  def done_clues(%{clues: clues, lost: lost, cur_word: cur_word} = state) do
+    clues =
+      clues
+      |> Enum.reject(&elem(&1, 1))
+      |> Enum.map(&elem(&1, 0))
 
-  def continue_or_end(%{words: words, cur_seat: cur_seat, id_list: id_list} = state) do
-    if Enum.empty?(words) do
-      %{
-        state
-        | step: :end
-      }
-    else
-      %{
-        state
-        | cur_seat: next_seat(cur_seat, id_list)
-      }
-      |> write_clues()
+    case length(clues) do
+      0 ->
+        %{
+          state
+          | clues: clues,
+            step: :pass,
+            lost: [cur_word | lost]
+        }
+
+      _ ->
+        %{
+          state
+          | clues: clues,
+            step: :guess
+        }
     end
   end
 
@@ -164,16 +184,7 @@ defmodule Game.JekBox.State do
     guess(state, cur_word)
   end
 
-  def wrong(%{cur_word: cur_word, lost: lost, words: [next_word | words]} = state) do
-    %{
-      state
-      | lost: [next_word, cur_word | lost],
-        words: words,
-        step: :actually_wrong
-    }
-  end
-
-  def wrong(%{cur_word: cur_word, lost: lost, words: []} = state) do
+  def wrong(%{cur_word: cur_word, lost: lost} = state) do
     %{
       state
       | lost: [cur_word | lost],
@@ -181,13 +192,8 @@ defmodule Game.JekBox.State do
     }
   end
 
-  def allowed_to_register?(%{step: :lobby}, _id) do
-    true
-  end
-
-  def allowed_to_register?(%{game_ids: game_ids}, id) do
-    Map.has_key?(game_ids, id)
-  end
+  def allowed_to_register?(%{step: :lobby}, _id), do: true
+  def allowed_to_register?(%{game_ids: game_ids}, id), do: Map.has_key?(game_ids, id)
 
   def register_id(%{ids: ids} = state, id, name) do
     %{

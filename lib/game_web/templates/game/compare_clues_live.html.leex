@@ -1,10 +1,13 @@
 <%= preamble(assigns) %>
 
 <%= unless guesser?(assigns) do %>
-  <h2>Mystery Word:</h2>
+  <h2>Mystery Word</h2>
   <%= present_word(@state.cur_word) %>
-  <h2>Select any duplicate or invalid clues:</h2>
+
+  <hr>
+  <h2>Select any duplicate or invalid clues</h2>
   <%= clues(assigns, true) %>
+
   <br>
   <button phx-click="done_clues">REMOVE SELECTED CLUES & CONTINUE</button>
 <% else %>

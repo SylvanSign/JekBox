@@ -11,7 +11,8 @@ defmodule Game.Server.Supervisor do
   def init(:ok) do
     children = [
       {Game.Server.Rooms, name: Game.Server.Rooms},
-      {DynamicSupervisor, name: Game.Server.RoomSupervisor, strategy: :one_for_one}
+      {DynamicSupervisor, name: Game.Server.RoomSupervisor, strategy: :one_for_one},
+      {Game.JekBox.Words, name: Game.JekBox.Words}
     ]
 
     Supervisor.init(children, strategy: :rest_for_one)

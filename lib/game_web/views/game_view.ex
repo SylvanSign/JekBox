@@ -4,13 +4,36 @@ defmodule GameWeb.GameView do
   def preamble(assigns) do
     ~L"""
     <%= if @state.step != :lobby and @state.step != :end do %>
-      <h1>Word <%= bold(@state.word_count - length(@state.words)) %> of <%= bold(@state.word_count) %></h1>
+      <h2><%= score(assigns) %> · <%= strikes(assigns) %></h2>
+      <hr>
       <%= if guesser?(assigns) do %>
         <h2><%= bold("Guesser") %></h2>
       <% else %>
         <h2><%= bold("Clue Giver") %> for <%= tag_guesser(@state.guesser_name) %></h2>
       <% end %>
     <% end %>
+    <hr>
+    """
+  end
+
+  def score(assigns) do
+    ~L"""
+    Score: <%= bold(length(@state.scored), :green) %>
+    """
+  end
+
+  def strikes(assigns) do
+    lost = length(assigns.state.lost)
+    strikes = assigns.state.strikes
+
+    color =
+      case lost do
+        0 -> :green
+        _ -> :red
+      end
+
+    ~L"""
+    Strikes: <%= bold(lost, color) %> <%= bold("/ #{strikes}") %>
     """
   end
 
@@ -36,10 +59,18 @@ defmodule GameWeb.GameView do
     """
   end
 
-  def bold(word) do
-    ~e"""
-    <strong><%= word %></strong>
-    """
+  def bold(word, color \\ nil) do
+    case color do
+      nil ->
+        ~e"""
+        <strong><%= word %></strong>
+        """
+
+      _ ->
+        ~e"""
+        <strong style="color: <%= color %>;"><%= word %></strong>
+        """
+    end
   end
 
   def tag_guesser(name) do
@@ -55,12 +86,4 @@ defmodule GameWeb.GameView do
     </blockquote>
     """
   end
-
-  def score_message(13), do: "Perfect score! Can you do it again?"
-  def score_message(12), do: "Incredible! Your friends must be impressed!"
-  def score_message(11), do: "Awesome! That's a score worth celebrating!"
-  def score_message(score) when score in 9..10, do: "Wow, not bad at all!"
-  def score_message(score) when score in 7..8, do: "You're in the average. Can you do better?"
-  def score_message(score) when score in 4..6, do: "That's a good start. Try again!"
-  def score_message(score) when score in 0..3, do: "Try again, and again, and again."
 end
