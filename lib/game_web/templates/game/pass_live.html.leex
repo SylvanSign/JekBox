@@ -1,8 +1,11 @@
 <%= preamble(assigns) %>
 
-<h2>You got a <%= bold("STRIKE", :red) %> since no clues survived</h2>
+<h2>💔 since no clues survived</h2>
 <% name = if guesser?(assigns), do: "YOU", else: @state.guesser_name %>
-<h2><%= tag_guesser(name) %> will remain the <%= bold("Guesser") %></h2>
+
+<%= unless length(@state.lost) == @state.lives do %>
+  <h2><%= tag_guesser(name) %> will remain the <%= bold("Guesser") %></h2>
+<% end %>
 
 <h2>Mystery Word</h2>
 <%= present_word(@state.cur_word) %>
@@ -12,5 +15,5 @@
 
 <%= if guesser?(assigns) do %>
   <hr>
-  <button phx-click="start">CONTINUE</button>
+  <%= continue_button(assigns) %>
 <% end %>

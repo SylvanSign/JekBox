@@ -25,7 +25,6 @@ defmodule GameWeb.GameLive do
       )
 
     if connected?(socket) do
-      IO.puts(">>>>> Room: #{room} - Name: #{name} - Id: #{id}")
       room_pid = Rooms.pid(room)
       GameWeb.Endpoint.subscribe(room)
 

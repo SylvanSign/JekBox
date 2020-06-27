@@ -1,13 +1,23 @@
 <% score = length(@state.scored) %>
 
-<h2><%= bold("=== GAME OVER ===") %></h2>
-<h2><%= bold("FINAL SCORE:") %> <%= bold(score, :green) %></h2>
+<%= if score > @state.record do %>
+  <h2><%= bold("✨✨ NEW BEST! ✨✨") %></h2>
+<% end %>
+
+<h2><%= bold("FINAL SCORE") %></h2>
+<h2><%= present_word(score) %></h2>
+
+<hr>
+
 <h2><%= bold("SCORED", :green) %> Words</h2>
 <ul>
   <%= for scored <- @state.scored do %>
     <li><%= bold(scored) %></li>
   <% end %>
 </ul>
+
+<hr>
+
 <h2><%= bold("LOST", :red) %> Words</h2>
 <ul>
   <%= for lost <- @state.lost do %>
@@ -16,4 +26,5 @@
 </ul>
 
 <hr>
+
 <button phx-click="restart">PLAY AGAIN?</button>

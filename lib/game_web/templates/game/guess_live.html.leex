@@ -1,15 +1,22 @@
 <%= preamble(assigns) %>
 
+<%= unless guesser?(assigns) do %>
+  <h2>Mystery Word</h2>
+  <%= present_word(@state.cur_word) %>
+<% end %>
+
 <h2>Your clues</h2>
 <%= for clue <- @state.clues do %>
   <button class="button-clear"><%= clue %></button>
 <% end %>
+
+<hr>
+
 <%= if guesser?(assigns) do %>
-  <hr>
+  <h2>Type your guess here</h2>
   <%= f = form_for :guess, "", [phx_submit: "guess"] %>
-    <label for="guess"><%= bold("GUESS?") %></label>
     <%= text_input f, :guess, autofocus: true, required: true, pattern: "^\s*[^ ]+\s*$", title: "Guess must be one word only", placeholder: "GUESS MYSTERY WORD", style: "text-transform:uppercase", maxLength: 30, autocapitalize: "off", autocorrect: "off", autocomplete: "off" %>
-    <%= submit "GUESS" %>
+    <%= submit "SUBMIT" %>
   </form>
 <% else %>
   <h2><%= tag_guesser(@state.guesser_name) %> is thinking...</h2>

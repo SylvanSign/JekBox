@@ -1,6 +1,6 @@
 <%= preamble(assigns) %>
 
-<h2>You got a <%= bold("STRIKE", :red) %> for missing</h2>
+<h2>💔 for missing</h2>
 <%= present_word(@state.cur_word) %>
 
 <h2>Your Guess</h2>
@@ -10,5 +10,5 @@
 
 <%= if guesser?(assigns) do %>
   <hr>
-  <button phx-click="start">CONTINUE</button>
+  <%= continue_button(assigns) %>
 <% end %>

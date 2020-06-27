@@ -4,7 +4,7 @@ defmodule GameWeb.GameView do
   def preamble(assigns) do
     ~L"""
     <%= if @state.step != :lobby and @state.step != :end do %>
-      <h2><%= score(assigns) %> · <%= strikes(assigns) %></h2>
+      <h2><%= lives(assigns) %> · <%= score(assigns) %> · <%= top_score(assigns) %></h2>
       <hr>
       <%= if guesser?(assigns) do %>
         <h2><%= bold("Guesser") %></h2>
@@ -17,23 +17,51 @@ defmodule GameWeb.GameView do
   end
 
   def score(assigns) do
-    ~L"""
-    Score: <%= bold(length(@state.scored), :green) %>
-    """
-  end
-
-  def strikes(assigns) do
-    lost = length(assigns.state.lost)
-    strikes = assigns.state.strikes
+    score = length(assigns.state.scored)
 
     color =
-      case lost do
-        0 -> nil
-        _ -> :red
+      if score > assigns.state.record do
+        :green
+      else
+        :black
       end
 
     ~L"""
-    Strikes: <%= bold(lost, color) %> <%= bold("/ #{strikes}") %>
+    Score: <%= bold(length(@state.scored), color) %>
+    """
+  end
+
+  def top_score(assigns) do
+    score = length(assigns.state.scored)
+
+    ~L"""
+    Best: <%= bold(max(@state.record, score), :green) %>
+    """
+  end
+
+  def lives(assigns) do
+    lost = length(assigns.state.lost)
+    lives = assigns.state.lives
+    lives_left = lives - lost
+
+    hearts = String.duplicate("❤️", lives_left)
+    xs = String.duplicate("💔", lost)
+
+    ~L"""
+    <%= hearts <> xs %>
+    """
+  end
+
+  def continue_button(assigns) do
+    button_text =
+      unless length(assigns.state.lost) == assigns.state.lives do
+        "NEXT ROUND"
+      else
+        "SEE FINAL SCORE"
+      end
+
+    ~L"""
+    <button phx-click="start"><%= button_text %></button>
     """
   end
 

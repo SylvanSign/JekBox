@@ -1,13 +1,14 @@
 defmodule Game.JekBox.State do
   alias Game.JekBox
 
-  def new(room, strikes \\ 3) do
+  def new(room, lives \\ 3) do
     %{
       # fields set while in lobby:
       room: room,
       step: :lobby,
       ids: Map.new(),
-      strikes: strikes,
+      lives: lives,
+      record: 0,
       # streak: 0, # TODO would be cool to keep track of "correct streak"
       # everything computed after starting game:
       clues: %{},
@@ -26,10 +27,11 @@ defmodule Game.JekBox.State do
     }
   end
 
-  def restart(%{room: room, ids: ids, strikes: strikes}) do
+  def restart(%{room: room, ids: ids, lives: lives, scored: scored, record: record}) do
     %{
-      new(room, strikes)
-      | ids: ids
+      new(room, lives)
+      | ids: ids,
+        record: max(record, length(scored))
     }
     |> fix_state()
     |> start()
@@ -45,8 +47,8 @@ defmodule Game.JekBox.State do
     |> continue_or_end()
   end
 
-  def continue_or_end(%{strikes: strikes, lost: lost} = state)
-      when length(lost) == strikes do
+  def continue_or_end(%{lives: lives, lost: lost} = state)
+      when length(lost) == lives do
     %{
       state
       | step: :end

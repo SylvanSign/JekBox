@@ -62,9 +62,11 @@ defmodule Game.Server.Room do
   # Server Callbacks
   @impl true
   def init(room) do
-    :timer.send_after(@timeout, room, :close_if_empty)
+    state = State.new(room, @strikes)
+    pids = %{}
+    timer = Process.send_after(self(), :close_if_empty, @timeout)
 
-    {:ok, {State.new(room, @strikes), %{}}}
+    {:ok, {state, pids, timer}}
   end
 
   @impl true
@@ -73,97 +75,99 @@ defmodule Game.Server.Room do
   end
 
   @impl true
-  def handle_call({:register, id, name}, {pid, _}, {state, pids}) do
+  def handle_call({:register, id, name}, {pid, _}, {state, pids, timer}) do
     if State.allowed_to_register?(state, id) do
+      Process.cancel_timer(timer)
+
       state =
-        {state, pids}
+        {state, pids, timer}
         |> register_pid(pid, id, name)
         |> broadcast_state()
 
       {:reply, :ok, state}
     else
-      {:reply, {:error, "Can't join game since it's already in progress"}, {state, pids}}
+      {:reply, {:error, "Can't join game since it's already in progress"}, {state, pids, timer}}
     end
   end
 
   @impl true
-  def handle_call(:start, _from, {state, pids}) do
+  def handle_call(:start, _from, {state, pids, timer}) do
     new_state =
-      {State.start(state), pids}
+      {State.start(state), pids, timer}
       |> broadcast_state()
 
     {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_call(:restart, _from, {state, pids}) do
+  def handle_call(:restart, _from, {state, pids, timer}) do
     new_state =
-      {State.restart(state), pids}
+      {State.restart(state), pids, timer}
       |> broadcast_state()
 
     {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_call({:clue, clue}, {pid, _}, {state, pids}) do
+  def handle_call({:clue, clue}, {pid, _}, {state, pids, timer}) do
     id = pids[pid]
 
     new_state =
-      {State.clue(state, id, clue), pids}
+      {State.clue(state, id, clue), pids, timer}
       |> broadcast_state()
 
     {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_call({:toggle_duplicate, clue}, _from, {state, pids}) do
+  def handle_call({:toggle_duplicate, clue}, _from, {state, pids, timer}) do
     new_state =
-      {State.toggle_duplicate(state, clue), pids}
+      {State.toggle_duplicate(state, clue), pids, timer}
       |> broadcast_state()
 
     {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_call(:done_clues, _from, {state, pids}) do
+  def handle_call(:done_clues, _from, {state, pids, timer}) do
     new_state =
-      {State.done_clues(state), pids}
+      {State.done_clues(state), pids, timer}
       |> broadcast_state()
 
     {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_call({:guess, guess}, _from, {state, pids}) do
+  def handle_call({:guess, guess}, _from, {state, pids, timer}) do
     new_state =
-      {State.guess(state, guess), pids}
+      {State.guess(state, guess), pids, timer}
       |> broadcast_state()
 
     {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_call(:pass, _from, {state, pids}) do
+  def handle_call(:pass, _from, {state, pids, timer}) do
     new_state =
-      {State.pass(state), pids}
+      {State.pass(state), pids, timer}
       |> broadcast_state()
 
     {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_call(:right, _from, {state, pids}) do
+  def handle_call(:right, _from, {state, pids, timer}) do
     new_state =
-      {State.right(state), pids}
+      {State.right(state), pids, timer}
       |> broadcast_state()
 
     {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_call(:wrong, _from, {state, pids}) do
+  def handle_call(:wrong, _from, {state, pids, timer}) do
     new_state =
-      {State.wrong(state), pids}
+      {State.wrong(state), pids, timer}
       |> broadcast_state()
 
     {:reply, :ok, new_state}
@@ -173,15 +177,12 @@ defmodule Game.Server.Room do
   def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do
     IO.puts("Room dropping #{inspect(pid)}")
 
-    case forget_pid(state, pid) do
-      :shutdown ->
-        {:stop, :shutdown, state}
+    state =
+      state
+      |> forget_pid(pid)
+      |> broadcast_state()
 
-      state ->
-        {:noreply,
-         state
-         |> broadcast_state()}
-    end
+    {:noreply, state}
   end
 
   @impl true
@@ -197,28 +198,31 @@ defmodule Game.Server.Room do
   end
 
   # Private Helpers
-  defp register_pid({state, pids}, pid, id, name) do
+  defp register_pid({state, pids, timer}, pid, id, name) do
     Process.monitor(pid)
-    {State.register_id(state, id, name), Map.put(pids, pid, id)}
+    {State.register_id(state, id, name), Map.put(pids, pid, id), timer}
   end
 
-  defp forget_pid({state, pids}, pid) do
+  defp forget_pid({state, pids, timer}, pid) do
     id = pids[pid]
     %{ids: ids} = state = State.forget_id(state, id)
 
-    if map_size(ids) == 0 do
-      :timer.send_after(@timeout, :close_if_empty)
-    end
+    timer =
+      if map_size(ids) == 0 do
+        Process.send_after(self(), :close_if_empty, @timeout)
+      else
+        timer
+      end
 
-    {state, Map.delete(pids, pid)}
+    {state, Map.delete(pids, pid), timer}
   end
 
-  defp broadcast_state({%{broadcast: true} = state, pids}) do
+  defp broadcast_state({%{broadcast: true} = state, pids, timer}) do
     GameWeb.Endpoint.broadcast!(state.room, "state", %{state: state})
-    {state, pids}
+    {state, pids, timer}
   end
 
-  defp broadcast_state({%{broadcast: false} = state, pids}) do
-    {state, pids}
+  defp broadcast_state({%{broadcast: false} = state, pids, timer}) do
+    {state, pids, timer}
   end
 end
