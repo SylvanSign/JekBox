@@ -53,7 +53,6 @@ defmodule Game.Server.Rooms do
 
   @impl true
   def handle_info({:DOWN, _ref, :process, room_pid, _reason}, state) do
-    IO.puts("Rooms dropping room #{inspect(room_pid)}")
     state = delete_room_by_pid(state, room_pid)
     {:noreply, state}
   end

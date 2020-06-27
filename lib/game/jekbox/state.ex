@@ -81,7 +81,7 @@ defmodule Game.JekBox.State do
       id_list
       |> List.delete_at(cur_seat)
       |> Enum.map(&elem(&1, 0))
-      |> Enum.into(%{}, &{&1, ""})
+      |> Enum.into(%{}, &{&1, []})
 
     {cur_id, guesser_name} = id_list |> Enum.at(cur_seat)
 
@@ -109,7 +109,10 @@ defmodule Game.JekBox.State do
     }
 
     unless pending_clues == 0 do
-      state
+      %{
+        state
+        | broadcast: false
+      }
     else
       {clues, dups} = prep_for_clue_comparison(clues)
 
@@ -117,7 +120,8 @@ defmodule Game.JekBox.State do
         state
         | step: :compare_clues,
           clues: clues,
-          dups: dups
+          dups: dups,
+          broadcast: true
       }
     end
   end
@@ -125,7 +129,8 @@ defmodule Game.JekBox.State do
   def toggle_duplicate(%{clues: clues} = state, clue) do
     %{
       state
-      | clues: Map.update!(clues, clue, &(not &1))
+      | clues: Map.update!(clues, clue, &(not &1)),
+        broadcast: true
     }
   end
 
@@ -149,7 +154,8 @@ defmodule Game.JekBox.State do
           | clues: clues,
             dups: dups,
             step: :pass,
-            lost: [cur_word | lost]
+            lost: [cur_word | lost],
+            broadcast: true
         }
 
       _ ->
@@ -157,7 +163,8 @@ defmodule Game.JekBox.State do
           state
           | clues: clues,
             dups: dups,
-            step: :guess
+            step: :guess,
+            broadcast: true
         }
     end
   end
@@ -170,7 +177,8 @@ defmodule Game.JekBox.State do
     %{
       state
       | lost: [cur_word | lost],
-        step: :pass
+        step: :pass,
+        broadcast: true
     }
   end
 
@@ -179,7 +187,8 @@ defmodule Game.JekBox.State do
       state
       | scored: [guess | scored],
         cur_guess: guess,
-        step: :right
+        step: :right,
+        broadcast: true
     }
   end
 
@@ -187,7 +196,8 @@ defmodule Game.JekBox.State do
     %{
       state
       | step: :probably_wrong,
-        cur_guess: guess
+        cur_guess: guess,
+        broadcast: true
     }
   end
 
@@ -200,12 +210,20 @@ defmodule Game.JekBox.State do
     %{
       state
       | lost: [cur_word | lost],
-        step: :actually_wrong
+        step: :actually_wrong,
+        broadcast: true
     }
   end
 
   def allowed_to_register?(%{step: :lobby}, _id), do: true
   def allowed_to_register?(%{game_ids: game_ids}, id), do: Map.has_key?(game_ids, id)
+
+  def register_id(%{game_ids: game_ids} = state, _id, _name) when map_size(game_ids) > 0 do
+    %{
+      state
+      | broadcast: false
+    }
+  end
 
   def register_id(%{ids: ids} = state, id, name) do
     %{
@@ -213,6 +231,13 @@ defmodule Game.JekBox.State do
       | ids: Map.put(ids, id, name)
     }
     |> fix_state()
+  end
+
+  def forget_id(%{game_ids: game_ids} = state, _id) when map_size(game_ids) > 0 do
+    %{
+      state
+      | broadcast: false
+    }
   end
 
   def forget_id(%{ids: ids} = state, id) do
@@ -240,6 +265,7 @@ defmodule Game.JekBox.State do
     {clues, dups} =
       clues
       |> Enum.map(&elem(&1, 1))
+      |> Enum.concat()
       |> Enum.reduce({%{}, %{}}, fn clue, {all, dups} ->
         if Map.has_key?(all, clue) do
           {all, Map.update(dups, clue, 2, &(&1 + 1))}

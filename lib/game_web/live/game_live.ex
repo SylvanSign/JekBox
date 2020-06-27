@@ -21,6 +21,7 @@ defmodule GameWeb.GameLive do
         room: room,
         id: id,
         name: name,
+        clue_pending?: true,
         state: %{}
       )
 
@@ -29,11 +30,12 @@ defmodule GameWeb.GameLive do
       GameWeb.Endpoint.subscribe(room)
 
       case Room.register(room_pid, id, name) do
-        :ok ->
+        {:ok, state} ->
           {:ok,
            assign(
              socket,
-             room_pid: room_pid
+             room_pid: room_pid,
+             state: state
            )}
 
         {:error, error} ->
@@ -54,14 +56,15 @@ defmodule GameWeb.GameLive do
   end
 
   @impl true
-  def handle_event("clue", %{"clue" => %{"clue" => clue}}, socket) do
-    clue =
-      clue
-      |> String.trim()
-      |> String.upcase()
+  def handle_event("clue", %{"clue" => clues}, socket) do
+    clues =
+      clues
+      |> Stream.map(&elem(&1, 1))
+      |> Stream.map(&String.trim/1)
+      |> Enum.map(&String.upcase/1)
 
-    Room.clue(socket.assigns.room_pid, clue)
-    {:noreply, socket}
+    Room.clue(socket.assigns.room_pid, clues)
+    {:noreply, assign(socket, clue_pending?: false)}
   end
 
   @impl true
@@ -115,7 +118,8 @@ defmodule GameWeb.GameLive do
   def handle_info(%{event: "state", payload: %{state: state}}, socket) do
     {:noreply,
      assign(socket,
-       state: state
+       state: state,
+       clue_pending?: true
      )}
   end
 end

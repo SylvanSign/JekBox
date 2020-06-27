@@ -6,10 +6,18 @@
   <hr>
 <% end %>
 
-<%= if @state.clues[@id] == "" do %>
-  <h2>Type your clue here</h2>
+<%= if @state.clues[@id] == [] and @clue_pending? do %>
+  <% three_players? = map_size(@state.game_ids) == 3 %>
+  <%= if three_players? do %>
+    <h2>Type your clues here</h2>
+  <% else %>
+    <h2>Type your clue here</h2>
+  <% end %>
   <%= f = form_for :clue, "", [phx_submit: "clue"] %>
-    <%= text_input f, :clue, autofocus: true, required: true, pattern: "^\s*[^ ]+\s*$", title: "Clue must be one word only", placeholder: "ENTER ONE WORD CLUE for '#{@state.cur_word}'", style: "text-transform:uppercase", maxLength: 30, autocapitalize: "off", autocorrect: "off", autocomplete: "off" %>
+    <%= text_input f, "1", autofocus: true, required: true, pattern: "^\s*[^ ]+\s*$", title: "Clue must be one word only", placeholder: "ENTER ONE WORD CLUE for '#{@state.cur_word}'", style: "text-transform:uppercase", maxLength: 30, autocapitalize: "off", autocorrect: "off", autocomplete: "off" %>
+    <%= if three_players? do %>
+      <%= text_input f, "2", autofocus: true, required: true, pattern: "^\s*[^ ]+\s*$", title: "Clue must be one word only", placeholder: "ENTER ONE WORD CLUE for '#{@state.cur_word}'", style: "text-transform:uppercase", maxLength: 30, autocapitalize: "off", autocorrect: "off", autocomplete: "off" %>
+    <% end %>
     <%= submit "SUBMIT" %>
   </form>
 <% else %>

@@ -79,12 +79,13 @@ defmodule Game.Server.Room do
     if State.allowed_to_register?(state, id) do
       Process.cancel_timer(timer)
 
-      state =
+      {state, _pids, _timer} =
+        all_state =
         {state, pids, timer}
         |> register_pid(pid, id, name)
         |> broadcast_state()
 
-      {:reply, :ok, state}
+      {:reply, {:ok, state}, all_state}
     else
       {:reply, {:error, "Can't join game since it's already in progress"}, {state, pids, timer}}
     end
@@ -175,8 +176,6 @@ defmodule Game.Server.Room do
 
   @impl true
   def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do
-    IO.puts("Room dropping #{inspect(pid)}")
-
     state =
       state
       |> forget_pid(pid)
@@ -186,14 +185,13 @@ defmodule Game.Server.Room do
   end
 
   @impl true
-  def handle_info(:close_if_empty, {_, pids} = state)
+  def handle_info(:close_if_empty, {_state, pids, _timer} = state)
       when map_size(pids) > 0 do
     {:noreply, state}
   end
 
   @impl true
-  def handle_info(:close_if_empty, {%{room: room}, _pids} = state) do
-    IO.puts("Room #{room} shutting down after timing out")
+  def handle_info(:close_if_empty, state) do
     {:stop, :shutdown, state}
   end
 
