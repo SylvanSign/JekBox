@@ -88,6 +88,7 @@ defmodule Game.JekBox.State do
       | step: :write_clues,
         broadcast: true,
         clues: clues,
+        dups: [],
         cur_id: cur_id,
         guesser_name: guesser_name,
         cur_word: JekBox.Words.word(),
@@ -126,7 +127,14 @@ defmodule Game.JekBox.State do
     }
   end
 
-  def done_clues(%{clues: clues, lost: lost, cur_word: cur_word} = state) do
+  def done_clues(%{clues: clues, dups: dups, lost: lost, cur_word: cur_word} = state) do
+    dups =
+      clues
+      |> Enum.filter(&elem(&1, 1))
+      |> Enum.map(&elem(&1, 0))
+      |> Enum.concat(dups)
+      |> Enum.sort()
+
     clues =
       clues
       |> Enum.reject(&elem(&1, 1))
@@ -137,6 +145,7 @@ defmodule Game.JekBox.State do
         %{
           state
           | clues: clues,
+            dups: dups,
             step: :pass,
             lost: [cur_word | lost]
         }
@@ -145,6 +154,7 @@ defmodule Game.JekBox.State do
         %{
           state
           | clues: clues,
+            dups: dups,
             step: :guess
         }
     end
