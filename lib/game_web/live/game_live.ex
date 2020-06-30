@@ -115,7 +115,15 @@ defmodule GameWeb.GameLive do
   end
 
   @impl true
+  def handle_event("bot", _event, socket) do
+    Room.bot(socket.assigns.room_pid)
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info(%{event: "state", payload: %{state: state}}, socket) do
+    IO.puts(">>> Human got event")
+
     {:noreply,
      assign(socket,
        state: state,

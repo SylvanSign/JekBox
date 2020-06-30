@@ -1,5 +1,8 @@
 <h1>Room: <%= @room %></h1>
 <% len = length(@state.id_list) %>
+<hr>
+<button phx-click="bot">ADD BOT</button>
+<hr>
 <%= if len > 2 do %>
   <button phx-click="start">START GAME</button>
 <% else %>
