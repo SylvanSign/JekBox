@@ -2,7 +2,7 @@ defmodule Game.Server.Room do
   use GenServer, restart: :temporary
   alias Game.JekBox.State
 
-  @strikes 3
+  @lives 3
   @timeout 30_000
 
   # Client API
@@ -62,7 +62,7 @@ defmodule Game.Server.Room do
   # Server Callbacks
   @impl true
   def init(room) do
-    state = State.new(room, @strikes)
+    state = State.new(room, @lives)
     pids = %{}
     timer = Process.send_after(self(), :close_if_empty, @timeout)
 

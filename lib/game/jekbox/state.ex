@@ -253,11 +253,7 @@ defmodule Game.JekBox.State do
     %{
       state
       | broadcast: true,
-        id_list:
-          ids
-          |> Enum.sort(fn {a_id, _}, {b_id, _} ->
-            a_id < b_id
-          end)
+        id_list: Enum.shuffle(ids)
     }
   end
 
