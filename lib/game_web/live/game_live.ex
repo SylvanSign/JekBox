@@ -122,8 +122,6 @@ defmodule GameWeb.GameLive do
 
   @impl true
   def handle_info(%{event: "state", payload: %{state: state}}, socket) do
-    IO.puts(">>> Human got event")
-
     {:noreply,
      assign(socket,
        state: state,

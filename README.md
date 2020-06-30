@@ -23,5 +23,7 @@ If you like this app, please consider buying a copy of the physical boardgame wh
 - Official Site: https://justone-the-game.com/index.php?lang=en
 - BGG page: https://boardgamegeek.com/boardgame/254640/just-one
 
+Bot logic depends on [The Datamuse API](https://www.datamuse.com/api/)
+
 ## License
 GPLv3: https://www.gnu.org/licenses/gpl-3.0.html

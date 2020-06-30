@@ -206,7 +206,6 @@ defmodule Game.Server.Room do
 
   @impl true
   def handle_info(:close_if_empty, state) do
-    IO.puts("shutting down")
     {:stop, :shutdown, state}
   end
 
@@ -214,11 +213,9 @@ defmodule Game.Server.Room do
   defp register_pid({state, pids, humans, timer}, pid, id, name, bot?) do
     humans =
       unless bot? do
-        IO.puts(">>>>>>>> registering nonbot #{inspect(pid)}")
         Process.monitor(pid)
         humans + 1
       else
-        IO.puts(">>>>>>>> registering BOT #{inspect(pid)}")
         humans
       end
 
@@ -234,7 +231,6 @@ defmodule Game.Server.Room do
 
     timer =
       if humans == 0 do
-        IO.puts("will close room")
         Process.send_after(self(), :close_if_empty, @timeout)
       else
         timer
