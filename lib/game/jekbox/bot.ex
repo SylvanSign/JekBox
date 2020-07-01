@@ -48,7 +48,7 @@ defmodule Game.JekBox.Bot do
             }
           }
         },
-        {room_pid, timer}
+        {room_pid, _timer}
       ) do
     IO.puts(">>>>>>>> BOT ABOUT TO DONE_CLUES")
 
@@ -84,18 +84,27 @@ defmodule Game.JekBox.Bot do
   end
 
   def clues(word, count \\ 1) do
-    word =
-      word
-      |> String.trim()
-
-    {:ok, {_, _, raw}} = :httpc.request('https://api.datamuse.com/words?rel_trg=#{word}')
-
-    results = Jason.decode!(raw)
+    results = means_like(word)
 
     results
     |> Enum.take(div(length(results), 3))
     |> Enum.shuffle()
     |> Enum.take(count)
     |> Enum.map(&(&1 |> Map.get("word") |> String.upcase()))
+  end
+
+  def guess(words) do
+    words
+    |> Enum.join(",")
+    |> means_like()
+    |> hd()
+    |> Map.get("word")
+    |> String.upcase()
+  end
+
+  def means_like(input) do
+    {:ok, {_, _, raw}} = :httpc.request('https://api.datamuse.com/words?ml=#{input}')
+
+    Jason.decode!(raw)
   end
 end
