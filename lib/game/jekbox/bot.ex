@@ -159,7 +159,7 @@ defmodule Game.JekBox.Bot do
         {room_pid, id, name, timer}
       ) do
     log(name, "is leader at end")
-    sleep_seconds()
+    sleep_seconds(10)
     Room.restart(room_pid)
     {:noreply, {room_pid, id, name, timer}}
   end
