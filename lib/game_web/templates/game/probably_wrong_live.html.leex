@@ -5,6 +5,8 @@
 <%= present_word(@state.cur_word) %>
 <h2>Your Guess</h2>
 <%= present_word(@state.cur_guess) %>
+<h2>The Clues</h2>
+<%= clues(assigns) %>
 
 <%= if guesser?(assigns) do %>
   <button phx-click="wrong">I WAS WRONG</button>

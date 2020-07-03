@@ -8,79 +8,178 @@ defmodule Game.JekBox.Bot do
 
   def init({room_pid, room, id}) do
     send(self(), {:register, room, id})
-    {:ok, {room_pid, nil}}
+    {:ok, {room_pid, id, ""}}
   end
 
-  def handle_info({:register, room, id}, {room_pid, timer}) do
+  def handle_info({:register, room, id}, {room_pid, id, ""}) do
     name = "#{Game.Server.RoomCodes.new()} BOT"
     {:ok, _state} = Game.Server.Room.register_bot(room_pid, id, name)
     GameWeb.Endpoint.subscribe(room)
-    IO.puts(">>>>>>>> initialized #{name}")
-    {:noreply, {room_pid, timer}}
+    log(name, "initialized")
+    {:noreply, {room_pid, id, name}}
   end
 
   def handle_info(
         %{
-          event: "state",
           payload: %{
             state: %{
               step: :write_clues,
               game_ids: game_ids,
-              cur_word: cur_word
+              cur_word: cur_word,
+              cur_id: cur_id
             }
           }
         },
-        {room_pid, timer}
-      ) do
-    IO.puts(">>>>>>>> BOT ABOUT TO SEND CLUES")
-    Process.sleep(:rand.uniform(5000) + 1000)
+        {room_pid, id, name}
+      )
+      when cur_id != id do
+    log(name, "sending clues")
+    sleep_seconds()
     count = unless map_size(game_ids) == 3, do: 1, else: 2
     Room.clue(room_pid, clues(cur_word, count))
-    {:noreply, {room_pid, timer}}
+    {:noreply, {room_pid, id, name}}
   end
 
   def handle_info(
         %{
-          event: "state",
           payload: %{
             state: %{
-              step: :compare_clues
+              step: :compare_clues,
+              leader: id
             }
           }
         },
-        {room_pid, _timer}
+        {room_pid, id, name}
       ) do
-    IO.puts(">>>>>>>> BOT ABOUT TO DONE_CLUES")
-
-    timer = Process.send_after(self(), :done_clues, :rand.uniform(5000) + 3000)
-    {:noreply, {room_pid, timer}}
-  end
-
-  def handle_info(
-        %{
-          event: "state",
-          payload: %{
-            state: %{
-              step: :guess
-            }
-          }
-        },
-        {room_pid, timer}
-      ) do
-    IO.puts(">>>>>>>> BOT ABOUT TO GUESS")
-    timer = Process.cancel_timer(timer)
-
-    {:noreply, {room_pid, timer}}
-  end
-
-  def handle_info(:done_clues, {room_pid, timer}) do
+    log(name, "done comparing clues")
+    sleep_seconds()
     Room.done_clues(room_pid)
-    {:noreply, {room_pid, timer}}
+    {:noreply, {room_pid, id, name}}
   end
 
-  def handle_info(event, {room_pid, timer}) do
-    IO.puts(">>>>>>>> BOT GOT EVENT #{inspect(event)}")
-    {:noreply, {room_pid, timer}}
+  def handle_info(
+        %{
+          payload: %{
+            state: %{
+              step: :guess,
+              cur_id: id,
+              clues: clues
+            }
+          }
+        },
+        {room_pid, id, name}
+      ) do
+    log(name, "guessing")
+    sleep_seconds()
+    Room.guess(room_pid, guess(clues))
+    {:noreply, {room_pid, id, name}}
+  end
+
+  def handle_info(
+        %{
+          payload: %{
+            state: %{
+              step: :probably_wrong,
+              cur_id: id
+            }
+          }
+        },
+        {room_pid, id, name}
+      ) do
+    log(name, "was probably wrong")
+    sleep_seconds()
+    Room.wrong(room_pid)
+    {:noreply, {room_pid, id, name}}
+  end
+
+  def handle_info(
+        %{
+          payload: %{
+            state: %{
+              step: :probably_wrong,
+              cur_id: id
+            }
+          }
+        },
+        {room_pid, id, name}
+      ) do
+    log(name, "was probably wrong")
+    sleep_seconds()
+    Room.wrong(room_pid)
+    {:noreply, {room_pid, id, name}}
+  end
+
+  def handle_info(
+        %{
+          payload: %{
+            state: %{
+              step: :actually_wrong,
+              cur_id: id
+            }
+          }
+        },
+        {room_pid, id, name}
+      ) do
+    log(name, "was actually wrong")
+    sleep_seconds()
+    Room.start(room_pid)
+    {:noreply, {room_pid, id, name}}
+  end
+
+  def handle_info(
+        %{
+          payload: %{
+            state: %{
+              step: :pass,
+              cur_id: id
+            }
+          }
+        },
+        {room_pid, id, name}
+      ) do
+    log(name, "had to pass")
+    sleep_seconds()
+    Room.start(room_pid)
+    {:noreply, {room_pid, id, name}}
+  end
+
+  def handle_info(
+        %{
+          payload: %{
+            state: %{
+              step: :right,
+              cur_id: id
+            }
+          }
+        },
+        {room_pid, id, name}
+      ) do
+    log(name, "was right")
+    sleep_seconds()
+    Room.start(room_pid)
+    {:noreply, {room_pid, id, name}}
+  end
+
+  def handle_info(
+        %{
+          payload: %{
+            state: %{
+              step: :end,
+              leader: id
+            }
+          }
+        },
+        {room_pid, id, name}
+      ) do
+    log(name, "is leader at end")
+    sleep_seconds()
+    Room.restart(room_pid)
+    {:noreply, {room_pid, id, name}}
+  end
+
+  def handle_info(event, {room_pid, id, name}) do
+    log(name, "got event STEP [#{event.payload.state.step}]\n#{inspect(event)}")
+    {:noreply, {room_pid, id, name}}
   end
 
   def clues(word, count \\ 1) do
@@ -106,5 +205,13 @@ defmodule Game.JekBox.Bot do
     {:ok, {_, _, raw}} = :httpc.request('https://api.datamuse.com/words?ml=#{input}')
 
     Jason.decode!(raw)
+  end
+
+  def log(name, message) do
+    IO.puts(">>>>>>>> #{name} - #{message}")
+  end
+
+  def sleep_seconds(sec \\ 5) do
+    Process.sleep(sec * 1000)
   end
 end

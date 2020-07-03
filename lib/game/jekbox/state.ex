@@ -78,10 +78,13 @@ defmodule Game.JekBox.State do
           cur_seat: cur_seat
         } = state
       ) do
-    clues =
+    clue_ids =
       id_list
       |> List.delete_at(cur_seat)
       |> Enum.map(&elem(&1, 0))
+
+    clues =
+      clue_ids
       |> Enum.into(%{}, &{&1, []})
 
     {cur_id, guesser_name} = id_list |> Enum.at(cur_seat)
@@ -93,6 +96,7 @@ defmodule Game.JekBox.State do
         clues: clues,
         dups: [],
         cur_id: cur_id,
+        leader: hd(clue_ids),
         guesser_name: guesser_name,
         cur_word: JekBox.Words.word(),
         pending_clues: map_size(clues)

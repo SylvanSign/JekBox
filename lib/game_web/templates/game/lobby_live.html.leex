@@ -7,12 +7,12 @@
   <button phx-click="bot">ADD BOT</button>
 <% end %>
 
-<ul>
+<ul style="list-style: none;">
 <%= for {id, name} <- @state.id_list do %>
   <%= if id == @state.leader do %>
-    <li><%= name %> <sup>👑</sup></li>
+    <li>- <%= name %> <sup>👑</sup></li>
   <% else %>
-    <li><%= name %></li>
+    <li>- <%= name %></li>
   <% end %>
 <% end %>
 </ul>
