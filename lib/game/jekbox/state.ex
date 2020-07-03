@@ -56,11 +56,8 @@ defmodule Game.JekBox.State do
     }
   end
 
-  def continue_or_end(%{step: :pass, cur_seat: cur_seat} = state) do
-    %{
-      state
-      | cur_seat: cur_seat
-    }
+  def continue_or_end(%{step: :pass} = state) do
+    state
     |> write_clues()
   end
 
@@ -96,7 +93,7 @@ defmodule Game.JekBox.State do
         clues: clues,
         dups: [],
         cur_id: cur_id,
-        leader: hd(clue_ids),
+        leader: Enum.random(clue_ids),
         guesser_name: guesser_name,
         cur_word: JekBox.Words.word(),
         pending_clues: map_size(clues)

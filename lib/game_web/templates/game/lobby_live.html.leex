@@ -4,15 +4,15 @@
 <%= if @id == @state.leader do %>
   <label for="start">REQUIRES AT LEAST 3 PLAYERS</label>
   <button id="start" phx-click="start" <%= if len < 3, do: "disabled" %>>START GAME</button>
-  <button phx-click="bot">ADD BOT</button>
+  <button class="button-outline" phx-click="bot">+ 🤖 (EXPERIMENTAL)</button>
 <% end %>
 
-<ul style="list-style: none;">
+<ul>
 <%= for {id, name} <- @state.id_list do %>
   <%= if id == @state.leader do %>
-    <li>- <%= name %> <sup>👑</sup></li>
+    <li><%= name %> <sup>👑</sup></li>
   <% else %>
-    <li>- <%= name %></li>
+    <li><%= name %></li>
   <% end %>
 <% end %>
 </ul>

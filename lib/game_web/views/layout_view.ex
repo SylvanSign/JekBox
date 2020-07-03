@@ -3,7 +3,7 @@ defmodule GameWeb.LayoutView do
 
   def debug(assigns) do
     ~L"""
-    <%= if false do %>
+    <%= if true do %>
     <pre>
     <%= @state |> Enum.map(fn {k, v} -> "#{k}: #{inspect(v)}" end) |> Enum.join("\n") %>
     ======
