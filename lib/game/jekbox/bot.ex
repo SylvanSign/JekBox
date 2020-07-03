@@ -36,7 +36,7 @@ defmodule Game.JekBox.Bot do
       )
       when cur_id != id do
     log(name, "sending clues")
-    sleep_seconds()
+    sleep_seconds(1)
     count = unless map_size(game_ids) == 3, do: 1, else: 2
     Room.clue(room_pid, clues(cur_word, count))
     {:noreply, {room_pid, id, name, timer}}
@@ -74,7 +74,7 @@ defmodule Game.JekBox.Bot do
         {room_pid, id, name, timer}
       ) do
     log(name, "guessing")
-    sleep_seconds()
+    sleep_seconds(1)
     Room.guess(room_pid, guess(clues))
     {:noreply, {room_pid, id, name, timer}}
   end
