@@ -7,7 +7,6 @@
 <%= present_word(@state.cur_guess) %>
 
 <%= if guesser?(assigns) do %>
-  <hr>
   <button phx-click="wrong">I WAS WRONG</button>
   <button class="button-outline" phx-click="right">I WAS CLOSE ENOUGH</button>
 <% end %>

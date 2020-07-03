@@ -1,2 +1,2 @@
 #!/bin/bash
-iex --werl -S mix phx.server
+sudo iex --werl -S mix phx.server

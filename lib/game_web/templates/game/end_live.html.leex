@@ -7,8 +7,6 @@
 <h2><%= bold("FINAL SCORE") %></h2>
 <h2><%= present_word(score) %></h2>
 
-<hr>
-
 <h2><%= bold("SCORED", :green) %> Words</h2>
 <ul>
   <%= for scored <- @state.scored do %>
@@ -16,15 +14,11 @@
   <% end %>
 </ul>
 
-<hr>
-
 <h2><%= bold("LOST", :red) %> Words</h2>
 <ul>
   <%= for lost <- @state.lost do %>
     <li><%= bold(lost) %></li>
   <% end %>
 </ul>
-
-<hr>
 
 <button phx-click="restart">PLAY AGAIN?</button>

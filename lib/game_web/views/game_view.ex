@@ -4,15 +4,14 @@ defmodule GameWeb.GameView do
   def preamble(assigns) do
     ~L"""
     <%= if @state.step != :lobby and @state.step != :end do %>
-      <h2><%= lives(assigns) %> · <%= score(assigns) %> · <%= top_score(assigns) %></h2>
-      <hr>
+      <h2>Lives: <%= lives(assigns) %></h2>
+      <h2><%= score(assigns) %> · <%= top_score(assigns) %></h2>
       <%= if guesser?(assigns) do %>
         <h2><%= bold("Guesser") %></h2>
       <% else %>
         <h2><%= bold("Clue Giver") %> for <%= tag_guesser(@state.guesser_name) %></h2>
       <% end %>
     <% end %>
-    <hr>
     """
   end
 

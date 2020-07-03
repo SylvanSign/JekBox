@@ -1,17 +1,13 @@
 <h1>Room: <%= @room %></h1>
-<ul>
-<%= for {id, name} <- @state.id_list do %>
-  <%= if @id == id do %>
-    <li><%= name %> <%= bold("(YOU)") %></li>
-  <% else %>
-    <li><%= name %></li>
-  <% end %>
-<% end %>
-</ul>
 <% len = length(@state.id_list) %>
-<hr>
 <%= if len > 2 do %>
   <button phx-click="start">START GAME</button>
 <% else %>
   <h2>You need <%= 3 - len %> more player(s) to start</h2>
 <% end %>
+
+<ul>
+<%= for {_, name} <- @state.id_list do %>
+  <li><%= name %></li>
+<% end %>
+</ul>

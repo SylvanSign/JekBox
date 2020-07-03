@@ -10,8 +10,6 @@
   <button class="button-clear"><%= clue %></button>
 <% end %>
 
-<hr>
-
 <%= if guesser?(assigns) do %>
   <h2>Type your guess here</h2>
   <%= f = form_for :guess, "", [phx_submit: "guess"] %>

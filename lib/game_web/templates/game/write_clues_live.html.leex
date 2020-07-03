@@ -3,7 +3,6 @@
 <%= unless guesser?(assigns) do %>
   <h2>Mystery Word</h2>
   <%= present_word(@state.cur_word) %>
-  <hr>
 <% end %>
 
 <%= if @state.clues[@id] == [] and @clue_pending? do %>

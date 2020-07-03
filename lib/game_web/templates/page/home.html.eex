@@ -3,7 +3,6 @@
 <h2>Welcome, <%= @name %> <sup>(<a href="<%= Routes.page_path(@conn, :name) %>">change</a>)</sup></h2>
 
 <div>
-  <hr>
   <a href="<%= Routes.page_path(@conn, :join) %>"><button>JOIN GAME</button></a>
   <a href="<%= Routes.page_path(@conn, :new) %>"><button class="button-outline">NEW GAME</button></a>
 </div>
