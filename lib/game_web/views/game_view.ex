@@ -4,7 +4,7 @@ defmodule GameWeb.GameView do
   def preamble(assigns) do
     ~L"""
     <%= if @state.step != :lobby and @state.step != :end do %>
-      <h2>Lives: <%= lives(assigns) %></h2>
+      <h2><%= lives(assigns) %></h2>
       <h2><%= score(assigns) %> · <%= top_score(assigns) %></h2>
       <%= if guesser?(assigns) do %>
         <h2><%= bold("Guesser") %></h2>
@@ -26,7 +26,7 @@ defmodule GameWeb.GameView do
       end
 
     ~L"""
-    Score: <%= bold(length(@state.scored), color) %>
+    Score <%= bold(length(@state.scored), color) %>
     """
   end
 
@@ -34,7 +34,7 @@ defmodule GameWeb.GameView do
     score = length(assigns.state.scored)
 
     ~L"""
-    Best: <%= bold(max(@state.record, score), :green) %>
+    Best <%= bold(max(@state.record, score)) %>
     """
   end
 
