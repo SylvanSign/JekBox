@@ -51,7 +51,7 @@ defmodule GameWeb.GameView do
     """
   end
 
-  def continue_button(assigns) do
+  def continue_button(assigns, id \\ "") do
     button_text =
       unless length(assigns.state.lost) == assigns.state.lives do
         "NEXT ROUND"
@@ -60,7 +60,7 @@ defmodule GameWeb.GameView do
       end
 
     ~L"""
-    <button phx-click="start"><%= button_text %></button>
+    <button phx-click="start" id="<%= id %>"><%= button_text %></button>
     """
   end
 
