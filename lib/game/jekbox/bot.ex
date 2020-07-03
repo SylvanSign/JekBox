@@ -2,7 +2,7 @@ defmodule Game.JekBox.Bot do
   use GenServer
   alias Game.Server.Room
 
-  @default_sleep_seconds 3
+  @default_sleep_seconds 5
 
   def start_link(room_pid, room, id) do
     GenServer.start_link(__MODULE__, {room_pid, room, id})
