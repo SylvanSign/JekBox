@@ -10,6 +10,7 @@ defmodule Game.JekBox.State do
       record: 0,
       # streak: 0, # TODO would be cool to keep track of "correct streak"
       # everything computed after starting game:
+      leader: nil,
       lives: 0,
       clues: %{},
       dups: [],
@@ -55,11 +56,8 @@ defmodule Game.JekBox.State do
     }
   end
 
-  def continue_or_end(%{step: :pass, cur_seat: cur_seat} = state) do
-    %{
-      state
-      | cur_seat: cur_seat
-    }
+  def continue_or_end(%{step: :pass} = state) do
+    state
     |> write_clues()
   end
 
@@ -77,10 +75,13 @@ defmodule Game.JekBox.State do
           cur_seat: cur_seat
         } = state
       ) do
-    clues =
+    clue_ids =
       id_list
       |> List.delete_at(cur_seat)
       |> Enum.map(&elem(&1, 0))
+
+    clues =
+      clue_ids
       |> Enum.into(%{}, &{&1, []})
 
     {cur_id, guesser_name} = id_list |> Enum.at(cur_seat)
@@ -92,6 +93,7 @@ defmodule Game.JekBox.State do
         clues: clues,
         dups: [],
         cur_id: cur_id,
+        leader: Enum.random(clue_ids),
         guesser_name: guesser_name,
         cur_word: JekBox.Words.word(),
         pending_clues: map_size(clues)
@@ -223,6 +225,15 @@ defmodule Game.JekBox.State do
       state
       | broadcast: false
     }
+  end
+
+  def register_id(%{ids: ids} = state, id, name) when map_size(ids) == 0 do
+    %{
+      state
+      | ids: Map.put(ids, id, name),
+        leader: id
+    }
+    |> fix_state()
   end
 
   def register_id(%{ids: ids} = state, id, name) do

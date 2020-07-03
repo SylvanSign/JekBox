@@ -1,13 +1,18 @@
 <h1>Room: <%= @room %></h1>
+
 <% len = length(@state.id_list) %>
-<%= if len > 2 do %>
-  <button phx-click="start">START GAME</button>
-<% else %>
-  <h2>You need <%= 3 - len %> more player(s) to start</h2>
+<%= if @id == @state.leader do %>
+  <label for="start">REQUIRES AT LEAST 3 PLAYERS</label>
+  <button id="start" phx-click="start" <%= if len < 3, do: "disabled" %>>START GAME</button>
+  <button class="button-outline" phx-click="bot">+ 🤖 (EXPERIMENTAL)</button>
 <% end %>
 
 <ul>
-<%= for {_, name} <- @state.id_list do %>
-  <li><%= name %></li>
+<%= for {id, name} <- @state.id_list do %>
+  <%= if id == @state.leader do %>
+    <li><%= name %> <sup>👑</sup></li>
+  <% else %>
+    <li><%= name %></li>
+  <% end %>
 <% end %>
 </ul>

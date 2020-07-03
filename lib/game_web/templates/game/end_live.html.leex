@@ -21,4 +21,6 @@
   <% end %>
 </ul>
 
-<button phx-click="restart">PLAY AGAIN?</button>
+<%= if @id == @state.leader do %>
+  <button phx-click="restart">PLAY AGAIN?</button>
+<% end %>
