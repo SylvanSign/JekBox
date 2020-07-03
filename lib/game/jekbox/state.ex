@@ -10,6 +10,7 @@ defmodule Game.JekBox.State do
       record: 0,
       # streak: 0, # TODO would be cool to keep track of "correct streak"
       # everything computed after starting game:
+      leader: nil,
       lives: 0,
       clues: %{},
       dups: [],
@@ -223,6 +224,15 @@ defmodule Game.JekBox.State do
       state
       | broadcast: false
     }
+  end
+
+  def register_id(%{ids: ids} = state, id, name) when map_size(ids) == 0 do
+    %{
+      state
+      | ids: Map.put(ids, id, name),
+        leader: id
+    }
+    |> fix_state()
   end
 
   def register_id(%{ids: ids} = state, id, name) do

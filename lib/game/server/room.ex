@@ -2,7 +2,7 @@ defmodule Game.Server.Room do
   use GenServer, restart: :temporary
   alias Game.JekBox.State
 
-  @timeout 30_000
+  @timeout 10_000
 
   # Client API
   def start_link(room) do
