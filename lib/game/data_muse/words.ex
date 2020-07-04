@@ -13,7 +13,7 @@ defmodule Game.DataMuse.Words do
     |> Enum.map(&String.upcase/1)
     |> Stream.reject(&String.contains?(&1, " "))
     |> Stream.reject(&(String.contains?(word, &1) or String.contains?(&1, word)))
-    |> Stream.reject(&(String.jaro_distance(&1, word) >= 0.75))
+    |> Stream.reject(&(String.jaro_distance(&1, word) >= 0.7))
     |> Stream.take(10)
     |> Enum.shuffle()
     |> Enum.take(count)
@@ -40,7 +40,7 @@ defmodule Game.DataMuse.Words do
     end)
     |> Enum.reject(fn suggestion ->
       Enum.reduce(words, false, fn word, rejected? ->
-        rejected? or String.jaro_distance(word, suggestion) >= 0.75
+        rejected? or String.jaro_distance(word, suggestion) >= 0.7
       end)
     end)
     |> hd()
