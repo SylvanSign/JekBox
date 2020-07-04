@@ -9,18 +9,14 @@ defmodule Game.DataMuse.Words do
       _ ->
         true
     end)
-    |> Stream.reject(fn
-      %{"word" => suggestion} ->
-        String.contains?(suggestion, " ")
-    end)
-    |> Stream.reject(fn
-      %{"word" => suggestion} ->
-        String.jaro_distance(suggestion, word) >= 0.75
-    end)
-    |> Stream.take(7)
+    |> Stream.map(&Map.get(&1, "word"))
+    |> Enum.map(&String.upcase/1)
+    |> Stream.reject(&String.contains?(&1, " "))
+    |> Stream.reject(&(String.contains?(word, &1) or String.contains?(&1, word)))
+    |> Stream.reject(&(String.jaro_distance(&1, word) >= 0.75))
+    |> Stream.take(10)
     |> Enum.shuffle()
-    |> Stream.take(count)
-    |> Enum.map(&(&1 |> Map.get("word") |> String.upcase()))
+    |> Enum.take(count)
   end
 
   def guess(words) do
@@ -34,19 +30,20 @@ defmodule Game.DataMuse.Words do
       _ ->
         true
     end)
-    |> Stream.reject(fn
-      %{"word" => suggestion} ->
-        String.contains?(suggestion, " ")
+    |> Stream.map(&Map.get(&1, "word"))
+    |> Enum.map(&String.upcase/1)
+    |> Stream.reject(&String.contains?(&1, " "))
+    |> Stream.reject(fn suggestion ->
+      Enum.reduce(words, false, fn word, rejected? ->
+        rejected? or String.contains?(word, suggestion) or String.contains?(suggestion, word)
+      end)
     end)
-    |> Enum.reject(fn
-      %{"word" => suggestion} ->
-        Enum.reduce(words, false, fn word, rejected? ->
-          rejected? or String.jaro_distance(word, suggestion) >= 0.75
-        end)
+    |> Enum.reject(fn suggestion ->
+      Enum.reduce(words, false, fn word, rejected? ->
+        rejected? or String.jaro_distance(word, suggestion) >= 0.75
+      end)
     end)
     |> hd()
-    |> Map.get("word")
-    |> String.upcase()
   end
 
   def ml(input) do
