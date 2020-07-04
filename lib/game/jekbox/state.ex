@@ -194,13 +194,23 @@ defmodule Game.JekBox.State do
     }
   end
 
-  def guess(state, guess) do
-    %{
-      state
-      | step: :probably_wrong,
-        cur_guess: guess,
-        broadcast: true
-    }
+  def guess(%{cur_word: cur_word, scored: scored} = state, guess) do
+    if String.jaro_distance(cur_word, guess) >= 0.9 do
+      %{
+        state
+        | scored: [cur_word | scored],
+          cur_guess: guess,
+          step: :right,
+          broadcast: true
+      }
+    else
+      %{
+        state
+        | step: :probably_wrong,
+          cur_guess: guess,
+          broadcast: true
+      }
+    end
   end
 
   def right(%{cur_word: cur_word} = state) do
