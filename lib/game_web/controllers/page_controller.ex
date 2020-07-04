@@ -37,7 +37,7 @@ defmodule GameWeb.PageController do
   end
 
   def join_room(conn, %{"form" => %{"room" => room}}) do
-    room = Game.Util.transform_room(room)
+    room = Game.Server.Util.transform_room(room)
 
     if Rooms.exists?(room) do
       conn
@@ -50,7 +50,7 @@ defmodule GameWeb.PageController do
   end
 
   def game(conn, %{"room" => room}) do
-    room = Game.Util.transform_room(room)
+    room = Game.Server.Util.transform_room(room)
 
     case get_session(conn, :name) do
       nil ->

@@ -1,6 +1,7 @@
 defmodule Game.JekBox.Bot do
   use GenServer
   alias Game.Server.Room
+  import Game.DataMuse.Words
 
   @default_sleep_seconds 5
 
@@ -57,7 +58,7 @@ defmodule Game.JekBox.Bot do
       Process.cancel_timer(timer)
     end
 
-    timer = Process.send_after(self(), :done_clues, 5 * 1000)
+    timer = Process.send_after(self(), :done_clues, 7 * 1000)
     {:noreply, {room_pid, id, name, timer}}
   end
 
@@ -159,7 +160,7 @@ defmodule Game.JekBox.Bot do
         {room_pid, id, name, timer}
       ) do
     log(name, "is leader at end")
-    sleep_seconds(10)
+    sleep_seconds(7)
     Room.restart(room_pid)
     {:noreply, {room_pid, id, name, timer}}
   end
@@ -172,31 +173,6 @@ defmodule Game.JekBox.Bot do
   def handle_info(event, {room_pid, id, name, timer}) do
     # log(name, "got event STEP [#{event.payload.state.step}]\n#{inspect(event, pretty: true)}")
     {:noreply, {room_pid, id, name, timer}}
-  end
-
-  def clues(word, count \\ 1) do
-    results = means_like(word)
-
-    results
-    |> Enum.take(div(length(results), 3))
-    |> Enum.shuffle()
-    |> Enum.take(count)
-    |> Enum.map(&(&1 |> Map.get("word") |> String.upcase()))
-  end
-
-  def guess(words) do
-    words
-    |> Enum.join(",")
-    |> means_like()
-    |> hd()
-    |> Map.get("word")
-    |> String.upcase()
-  end
-
-  def means_like(input) do
-    {:ok, {_, _, raw}} = :httpc.request('https://api.datamuse.com/words?ml=#{input}')
-
-    Jason.decode!(raw)
   end
 
   def log(name, message) do
