@@ -18,15 +18,8 @@ defmodule GameWeb.GameView do
   def score(assigns) do
     score = length(assigns.state.scored)
 
-    color =
-      if score > assigns.state.record do
-        :green
-      else
-        :black
-      end
-
     ~L"""
-    Score <%= bold(length(@state.scored), color) %>
+    Score <%= bold(length(@state.scored)) %>
     """
   end
 

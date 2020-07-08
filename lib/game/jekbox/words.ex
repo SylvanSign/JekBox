@@ -1,21 +1,26 @@
 defmodule Game.JekBox.Words do
   use Agent
 
+  @words Path.join(:code.priv_dir(:game), "nouns.txt")
+         |> File.read!()
+         |> String.split("\n", trim: true)
+
   def start_link(opts) do
-    Agent.start_link(fn -> new() end, opts)
+    Agent.start_link(fn -> Enum.shuffle(@words) end, opts)
   end
 
   def word do
-    Agent.get(__MODULE__, &Enum.random(&1))
-  end
+    Agent.get_and_update(__MODULE__, fn words ->
+      [w | ws] =
+        case words do
+          [] ->
+            Enum.shuffle(@words)
 
-  defp new do
-    file_path()
-    |> File.read!()
-    |> String.split("\n", trim: true)
-  end
+          words ->
+            words
+        end
 
-  defp file_path do
-    Path.join(:code.priv_dir(:game), "nouns.txt")
+      {w, ws}
+    end)
   end
 end
