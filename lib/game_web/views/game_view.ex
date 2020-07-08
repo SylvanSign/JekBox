@@ -16,8 +16,6 @@ defmodule GameWeb.GameView do
   end
 
   def score(assigns) do
-    score = length(assigns.state.scored)
-
     ~L"""
     Score <%= bold(length(@state.scored)) %>
     """
@@ -102,7 +100,7 @@ defmodule GameWeb.GameView do
   def present_word(word) do
     ~e"""
     <blockquote>
-      <%= bold(word) %>
+    <%= bold(word) %>
     </blockquote>
     """
   end
