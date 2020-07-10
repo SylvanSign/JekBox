@@ -1,6 +1,8 @@
 defmodule Game.JekBox.State do
   alias Game.JekBox
 
+  @lives 3
+
   def new(room) do
     %{
       # fields set while in lobby:
@@ -11,7 +13,7 @@ defmodule Game.JekBox.State do
       # streak: 0, # TODO would be cool to keep track of "correct streak"
       # everything computed after starting game:
       leader: nil,
-      lives: 0,
+      lives: @lives,
       clues: %{},
       dups: [],
       scored: [],
@@ -39,7 +41,7 @@ defmodule Game.JekBox.State do
   end
 
   def start(%{step: :lobby, ids: ids} = state) do
-    %{state | game_ids: ids, lives: map_size(ids)}
+    %{state | game_ids: ids}
     |> continue_or_end()
   end
 
