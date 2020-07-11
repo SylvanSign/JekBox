@@ -1,5 +1,5 @@
-defmodule GameWeb.LayoutView do
-  use GameWeb, :view
+defmodule JekBoxWeb.LayoutView do
+  use JekBoxWeb, :view
 
   def debug(assigns) do
     ~L"""

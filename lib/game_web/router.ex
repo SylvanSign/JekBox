@@ -1,11 +1,11 @@
-defmodule GameWeb.Router do
-  use GameWeb, :router
+defmodule JekBoxWeb.Router do
+  use JekBoxWeb, :router
 
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
-    plug :put_root_layout, {GameWeb.LayoutView, :root}
+    plug :put_root_layout, {JekBoxWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
@@ -14,7 +14,7 @@ defmodule GameWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", GameWeb do
+  scope "/", JekBoxWeb do
     pipe_through :browser
 
     get "/", PageController, :home
@@ -28,7 +28,7 @@ defmodule GameWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", GameWeb do
+  # scope "/api", JekBoxWeb do
   #   pipe_through :api
   # end
 
@@ -44,7 +44,7 @@ defmodule GameWeb.Router do
 
     scope "/" do
       pipe_through :browser
-      live_dashboard "/dashboard", metrics: GameWeb.Telemetry
+      live_dashboard "/dashboard", metrics: JekBoxWeb.Telemetry
     end
   end
 end

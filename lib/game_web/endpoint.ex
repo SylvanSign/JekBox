@@ -1,5 +1,5 @@
-defmodule GameWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :game
+defmodule JekBoxWeb.Endpoint do
+  use Phoenix.Endpoint, otp_app: :jek_box
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
@@ -18,7 +18,7 @@ defmodule GameWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
-    from: :game,
+    from: :jek_box,
     gzip: true,
     only: ~w(css fonts images js favicon.ico robots.txt)
 
@@ -45,5 +45,5 @@ defmodule GameWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug GameWeb.Router
+  plug JekBoxWeb.Router
 end

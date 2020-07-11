@@ -1,4 +1,4 @@
-defmodule Game.Server.RoomCodes do
+defmodule JekBox.Server.RoomCodes do
   def new() do
     file_path()
     |> File.read!()
@@ -8,6 +8,6 @@ defmodule Game.Server.RoomCodes do
   end
 
   defp file_path do
-    Path.join(:code.priv_dir(:game), "rooms.txt")
+    Path.join(:code.priv_dir(:jek_box), "rooms.txt")
   end
 end

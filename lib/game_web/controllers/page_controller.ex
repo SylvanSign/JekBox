@@ -1,6 +1,6 @@
-defmodule GameWeb.PageController do
-  use GameWeb, :controller
-  alias Game.Server.Rooms
+defmodule JekBoxWeb.PageController do
+  use JekBoxWeb, :controller
+  alias JekBox.Server.Rooms
   import Phoenix.LiveView.Controller
 
   def home(conn, _params) do
@@ -37,7 +37,7 @@ defmodule GameWeb.PageController do
   end
 
   def join_room(conn, %{"form" => %{"room" => room}}) do
-    room = Game.Server.Util.transform_room(room)
+    room = JekBox.Server.Util.transform_room(room)
 
     if Rooms.exists?(room) do
       conn
@@ -50,7 +50,7 @@ defmodule GameWeb.PageController do
   end
 
   def game(conn, %{"room" => room}) do
-    room = Game.Server.Util.transform_room(room)
+    room = JekBox.Server.Util.transform_room(room)
 
     case get_session(conn, :name) do
       nil ->
@@ -61,12 +61,12 @@ defmodule GameWeb.PageController do
           old_room = get_session(conn, :room)
 
           if old_room == room do
-            live_render(conn, GameWeb.GameLive, session: %{"room" => room})
+            live_render(conn, JekBoxWeb.JekBoxLive, session: %{"room" => room})
           else
             conn
             |> put_session(:room, room)
             |> put_session(:id, System.unique_integer())
-            |> live_render(GameWeb.GameLive, session: %{"room" => room})
+            |> live_render(JekBoxWeb.JekBoxLive, session: %{"room" => room})
           end
         else
           redirect(conn, to: Routes.page_path(conn, :home))

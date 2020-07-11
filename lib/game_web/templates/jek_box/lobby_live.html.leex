@@ -10,7 +10,7 @@
 <ul>
 <%= for {id, name} <- @state.id_list do %>
   <%= if id == @state.leader do %>
-    <li><%= name %> <sup>👑</sup></li>
+    <li><%= name %> <sup>(host)</sup></li>
   <% else %>
     <li><%= name %></li>
   <% end %>

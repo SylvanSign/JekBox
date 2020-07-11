@@ -1,4 +1,4 @@
-defmodule Game.Server.Rooms do
+defmodule JekBox.Server.Rooms do
   use GenServer
 
   # Client API
@@ -62,7 +62,7 @@ defmodule Game.Server.Rooms do
     {:ok, room} = get_unique_room_name(rooms)
 
     {:ok, room_pid} =
-      DynamicSupervisor.start_child(Game.Server.RoomSupervisor, {Game.Server.Room, room})
+      DynamicSupervisor.start_child(JekBox.Server.RoomSupervisor, {JekBox.Server.Room, room})
 
     Process.monitor(room_pid)
 
@@ -83,7 +83,7 @@ defmodule Game.Server.Rooms do
   end
 
   defp get_unique_room_name(rooms, tries \\ 0) do
-    name = Game.Server.RoomCodes.new()
+    name = JekBox.Server.RoomCodes.new()
 
     unless Map.has_key?(rooms, name) do
       {:ok, name}

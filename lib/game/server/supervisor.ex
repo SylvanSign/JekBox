@@ -1,4 +1,4 @@
-defmodule Game.Server.Supervisor do
+defmodule JekBox.Server.Supervisor do
   use Supervisor
 
   # Client API
@@ -10,9 +10,9 @@ defmodule Game.Server.Supervisor do
   @impl true
   def init(:ok) do
     children = [
-      {Game.Server.Rooms, name: Game.Server.Rooms},
-      {DynamicSupervisor, name: Game.Server.RoomSupervisor, strategy: :one_for_one},
-      {Game.JekBox.Words, name: Game.JekBox.Words}
+      {JekBox.Server.Rooms, name: JekBox.Server.Rooms},
+      {DynamicSupervisor, name: JekBox.Server.RoomSupervisor, strategy: :one_for_one},
+      {JekBox.JekBox.Words, name: JekBox.JekBox.Words}
     ]
 
     Supervisor.init(children, strategy: :rest_for_one)

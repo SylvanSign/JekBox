@@ -1,3 +1,3 @@
-defmodule GameWeb.PageView do
-  use GameWeb, :view
+defmodule JekBoxWeb.PageView do
+  use JekBoxWeb, :view
 end

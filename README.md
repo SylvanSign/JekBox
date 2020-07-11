@@ -1,4 +1,4 @@
-# Game
+# JekBox
 
 To start your Phoenix server:
 

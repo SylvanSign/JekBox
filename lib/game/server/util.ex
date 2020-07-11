@@ -1,4 +1,4 @@
-defmodule Game.Server.Util do
+defmodule JekBox.Server.Util do
   def transform_room(room) do
     room
     |> String.trim()

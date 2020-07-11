@@ -1,4 +1,4 @@
-defmodule GameWeb.Telemetry do
+defmodule JekBoxWeb.Telemetry do
   use Supervisor
   import Telemetry.Metrics
 
@@ -42,7 +42,7 @@ defmodule GameWeb.Telemetry do
     [
       # A module, function and arguments to be invoked periodically.
       # This function must call :telemetry.execute/3 and a metric must be added above.
-      # {GameWeb, :count_users, []}
+      # {JekBoxWeb, :count_users, []}
     ]
   end
 end

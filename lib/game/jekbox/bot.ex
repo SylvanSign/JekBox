@@ -1,7 +1,7 @@
-defmodule Game.JekBox.Bot do
+defmodule JekBox.JekBox.Bot do
   use GenServer
-  alias Game.Server.Room
-  import Game.DataMuse.Words
+  alias JekBox.Server.Room
+  import JekBox.DataMuse.Words
 
   @default_sleep_seconds 5
 
@@ -15,9 +15,9 @@ defmodule Game.JekBox.Bot do
   end
 
   def handle_info({:register, room, id}, {room_pid, id, "", timer}) do
-    name = "🤖 #{Game.Server.RoomCodes.new()} BOT"
-    {:ok, _state} = Game.Server.Room.register_bot(room_pid, id, name)
-    GameWeb.Endpoint.subscribe(room)
+    name = "🤖 #{JekBox.Server.RoomCodes.new()} BOT"
+    {:ok, _state} = JekBox.Server.Room.register_bot(room_pid, id, name)
+    JekBoxWeb.Endpoint.subscribe(room)
     log(name, "initialized")
     {:noreply, {room_pid, id, name, timer}}
   end

@@ -9,7 +9,7 @@
 <%= clues(assigns) %>
 
 <%= if guesser?(assigns) do %>
-  <hr>
+  <br>
   <button id="probably_wrong" phx-click="wrong">I WAS WRONG</button>
   <button class="button-outline" phx-click="right">I WAS CLOSE ENOUGH</button>
 <% end %>

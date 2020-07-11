@@ -1,12 +1,12 @@
-defmodule GameWeb do
+defmodule JekBoxWeb do
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, views, channels and so on.
 
   This can be used in your application as:
 
-      use GameWeb, :controller
-      use GameWeb, :view
+      use JekBoxWeb, :controller
+      use JekBoxWeb, :view
 
   The definitions below will be executed for every view,
   controller, etc, so keep them short and clean, focused
@@ -19,11 +19,11 @@ defmodule GameWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: GameWeb
+      use Phoenix.Controller, namespace: JekBoxWeb
 
       import Plug.Conn
-      import GameWeb.Gettext
-      alias GameWeb.Router.Helpers, as: Routes
+      import JekBoxWeb.Gettext
+      alias JekBoxWeb.Router.Helpers, as: Routes
     end
   end
 
@@ -31,7 +31,7 @@ defmodule GameWeb do
     quote do
       use Phoenix.View,
         root: "lib/game_web/templates",
-        namespace: GameWeb
+        namespace: JekBoxWeb
 
       # Import convenience functions from controllers
       import Phoenix.Controller,
@@ -45,7 +45,7 @@ defmodule GameWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {GameWeb.LayoutView, "live.html"}
+        layout: {JekBoxWeb.LayoutView, "live.html"}
 
       unquote(view_helpers())
     end
@@ -72,7 +72,7 @@ defmodule GameWeb do
   def channel do
     quote do
       use Phoenix.Channel
-      import GameWeb.Gettext
+      import JekBoxWeb.Gettext
     end
   end
 
@@ -87,9 +87,9 @@ defmodule GameWeb do
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
 
-      import GameWeb.ErrorHelpers
-      import GameWeb.Gettext
-      alias GameWeb.Router.Helpers, as: Routes
+      import JekBoxWeb.ErrorHelpers
+      import JekBoxWeb.Gettext
+      alias JekBoxWeb.Router.Helpers, as: Routes
     end
   end
 

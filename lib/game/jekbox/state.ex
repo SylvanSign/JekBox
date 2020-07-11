@@ -1,5 +1,5 @@
-defmodule Game.JekBox.State do
-  alias Game.JekBox
+defmodule JekBox.JekBox.State do
+  alias JekBox.JekBox
 
   @lives 3
 

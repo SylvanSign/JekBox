@@ -1,14 +1,12 @@
 <%= preamble(assigns) %>
 
-<h2>💔 for being wrong</h2>
+<h2>The guess was <%= bold("RIGHT!", :green) %></h2>
 <h2>Mystery Word</h2>
 <%= present_word(@state.cur_word) %>
-<h2>Your Guess</h2>
-<%= present_word(@state.cur_guess) %>
 <h2>The Clues</h2>
 <%= clues(assigns) %>
 
 <%= if guesser?(assigns) do %>
-  <hr>
-  <%= continue_button(assigns, "actually_wrong") %>
+  <br>
+  <%= continue_button(assigns, "right") %>
 <% end %>

@@ -1,6 +1,6 @@
-defmodule Game.Server.Room do
+defmodule JekBox.Server.Room do
   use GenServer, restart: :temporary
-  alias Game.JekBox.State
+  alias JekBox.JekBox.State
 
   @timeout 10_000
 
@@ -10,7 +10,7 @@ defmodule Game.Server.Room do
   end
 
   def state(room) when is_binary(room) do
-    pid = Game.Server.Rooms.pid(room)
+    pid = JekBox.Server.Rooms.pid(room)
     GenServer.call(pid, :state)
   end
 
@@ -184,7 +184,7 @@ defmodule Game.Server.Room do
 
   @impl true
   def handle_call(:bot, _from, {%{room: room} = state, pids, humans, timer}) do
-    {:ok, _pid} = Game.JekBox.Bot.start_link(self(), room, System.unique_integer())
+    {:ok, _pid} = JekBox.JekBox.Bot.start_link(self(), room, System.unique_integer())
     {:reply, :ok, {state, pids, humans, timer}}
   end
 
@@ -240,7 +240,7 @@ defmodule Game.Server.Room do
   end
 
   defp broadcast_state({%{broadcast: true} = state, pids, humans, timer}) do
-    GameWeb.Endpoint.broadcast!(state.room, "state", %{state: state})
+    JekBoxWeb.Endpoint.broadcast!(state.room, "state", %{state: state})
     {state, pids, humans, timer}
   end
 

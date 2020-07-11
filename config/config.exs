@@ -8,11 +8,11 @@
 use Mix.Config
 
 # Configures the endpoint
-config :game, GameWeb.Endpoint,
+config :jek_box, JekBoxWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "3ggJG5OfD7VeDnMAZGwjpBFWK3QCqdRvauEahI3fpbcQDyNQqblT8waIjnrdrkIs",
-  render_errors: [view: GameWeb.ErrorView, accepts: ~w(html json), layout: false],
-  pubsub_server: Game.PubSub,
+  render_errors: [view: JekBoxWeb.ErrorView, accepts: ~w(html json), layout: false],
+  pubsub_server: JekBox.PubSub,
   live_view: [signing_salt: "LL7YdjRx"]
 
 # Configures Elixir's Logger

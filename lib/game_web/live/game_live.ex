@@ -1,16 +1,16 @@
-defmodule GameWeb.GameLive do
-  use GameWeb, :live_view
-  alias Game.Server.Rooms
-  alias Game.Server.Room
+defmodule JekBoxWeb.JekBoxLive do
+  use JekBoxWeb, :live_view
+  alias JekBox.Server.Rooms
+  alias JekBox.Server.Room
 
   @impl true
   def render(%{state: %{step: step}} = assigns) do
-    GameWeb.GameView.render("#{step}_live.html", assigns)
+    JekBoxWeb.JekBoxView.render("#{step}_live.html", assigns)
   end
 
   @impl true
   def render(_) do
-    GameWeb.GameView.render("loading.html")
+    JekBoxWeb.JekBoxView.render("loading.html")
   end
 
   @impl true
@@ -27,7 +27,7 @@ defmodule GameWeb.GameLive do
 
     if connected?(socket) do
       room_pid = Rooms.pid(room)
-      GameWeb.Endpoint.subscribe(room)
+      JekBoxWeb.Endpoint.subscribe(room)
 
       case Room.register(room_pid, id, name) do
         {:ok, state} ->

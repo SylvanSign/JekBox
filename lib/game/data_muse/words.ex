@@ -1,4 +1,4 @@
-defmodule Game.DataMuse.Words do
+defmodule JekBox.DataMuse.Words do
   def clues(word, count \\ 1) do
     word
     |> ml()

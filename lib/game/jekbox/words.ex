@@ -1,4 +1,4 @@
-defmodule Game.JekBox.Words do
+defmodule JekBox.JekBox.Words do
   use Agent
 
   def start_link(opts) do
@@ -21,7 +21,7 @@ defmodule Game.JekBox.Words do
   end
 
   defp fresh_words do
-    Path.join(:code.priv_dir(:game), "nouns.txt")
+    Path.join(:code.priv_dir(:jek_box), "nouns.txt")
     |> File.read!()
     |> String.split("\n", trim: true)
     |> Enum.shuffle()

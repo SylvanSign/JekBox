@@ -1,5 +1,5 @@
-defmodule GameWeb.GameView do
-  use GameWeb, :view
+defmodule JekBoxWeb.JekBoxView do
+  use JekBoxWeb, :view
 
   def preamble(assigns) do
     ~L"""
