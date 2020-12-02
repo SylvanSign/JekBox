@@ -5,7 +5,7 @@
   <header>
     <%= link "Home", to: Routes.page_path(@conn, :home) %>
     ·
-    <%= link "Source", to: "https://github.com/SylvanSign/game" %>
+    <%= link "Source", to: "https://github.com/SylvanSign/JekBox" %>
     |
     inspired by <em>Just One</em>
     (<%= link "BGG", to: "https://boardgamegeek.com/boardgame/254640/just-one" %>
