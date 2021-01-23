@@ -9,7 +9,7 @@ If you like this app, please consider buying a copy of the physical boardgame wh
 Bot logic depends on [The Datamuse API](https://www.datamuse.com/api/)
 
 ## License
-GPLv3: https://www.gnu.org/licenses/gpl-3.0.html
+GNU AGPLv3: https://www.gnu.org/licenses/agpl-3.0.html
 
 ## Working with the code on your machine
 
