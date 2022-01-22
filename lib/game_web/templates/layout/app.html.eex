@@ -8,9 +8,9 @@
     <%= link "Source", to: "https://github.com/SylvanSign/JekBox" %>
     |
     inspired by <em>Just One</em>
-    (<%= link "BGG", to: "https://boardgamegeek.com/boardgame/254640/just-one" %>
+    (<%= link "Site", to: "https://justone-the-game.com/index.php?lang=en" %>
     ·
-    <%= link "Official Site", to: "https://justone-the-game.com/index.php?lang=en" %>)
+    <%= link "BGG", to: "https://boardgamegeek.com/boardgame/254640/just-one" %>)
   </header>
 
   <%= @inner_content %>
