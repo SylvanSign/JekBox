@@ -3,7 +3,7 @@ JekBox is an online, cooperative, word-based party game inspired by the board ga
 
 ## Credits
 If you like this app, please consider buying a copy of the physical boardgame which inspired it, _Just One_!
-- Official Site: https://justone-the-game.com/index.php?lang=en
+- Official Site: https://www.rprod.com/en/games/just-one/
 - BGG page: https://boardgamegeek.com/boardgame/254640/just-one
 
 Bot logic depends on [The Datamuse API](https://www.datamuse.com/api/)
