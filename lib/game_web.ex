@@ -80,8 +80,13 @@ defmodule GameWeb do
     quote do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
+      # To get live_flash https://elixirforum.com/t/phoenix-liveview-0-18-and-live-flash/50841
+      import Phoenix.Component
 
       # Import LiveView helpers (live_render, live_component, live_patch, etc)
+      # This should be redundant with Phoenix.Component according to the docs, but I get this error if I remove this line -
+      # "(CompileError) lib/game_web/templates/layout/root.html.leex:7: undefined function live_title_tag/2
+      # (expected GameWeb.LayoutView to define such a function or for it to be imported, but none are available)"
       import Phoenix.LiveView.Helpers
 
       # Import basic rendering functionality (render, render_layout, etc)
